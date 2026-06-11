@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  cpalma-db:
+    image: mysql:8.0
+    container_name: cpalma_mysql_container
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: muebles_cpalma_db
+      MYSQL_USER: dev_cpalma_user
+      MYSQL_PASSWORD: dev_secure_password_2026
+      MYSQL_ROOT_PASSWORD: root_secure_password_2026
+    ports:
+      - "3306:3306"
+    volumes:
+      - cpalma_persistence_data:/var/lib/mysql
+      # Mounts the initialization folder as read-only for security
+      - ./init-db:/docker-entrypoint-initdb.d:ro
+    networks:
+      - cpalma_internal_network
+
+networks:
+  cpalma_internal_network:
+    driver: bridge
+
+volumes:
+  cpalma_persistence_data:
+    driver: local

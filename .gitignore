@@ -1,0 +1,36 @@
+# =============================================================================
+# Muebles C Palma - Global Git Ignore
+# =============================================================================
+
+# compiled cue and OS garbage
+*.class
+*.log
+*.ctxt
+.DS_Store
+.cfignore
+Thumbs.db
+
+# Maven packaging outputs (Java compile target)
+backend/target/
+backend/*.jar
+backend/*.war
+
+# IDE Specific metadata (IntelliJ, Eclipse, VS Code)
+.idea/
+*.iml
+*.iws
+.classpath
+.project
+.settings/
+.vscode/
+*.code-workspace
+.factorypath
+
+# Docker specific runtime exclusions
+infrastructure/docker/mysql_data/
+*.env
+
+# Frontend / Node (For future phase)
+node_modules/
+frontend/dist/
+frontend/.next/
