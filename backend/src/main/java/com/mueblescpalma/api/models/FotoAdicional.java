@@ -1,25 +1,41 @@
 package com.mueblescpalma.api.models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "fotos_adicionales")
-@Data // Genera getters, setters, toString, equals y hashCode automáticamente gracias a Lombok
-@NoArgsConstructor // Genera el constructor vacío obligatorio para JPA
-@AllArgsConstructor // Genera un constructor con todos los campos
 public class FotoAdicional {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Mapea el AUTO_INCREMENT de MySQL
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "foto_url", nullable = false, length = 255)
     private String fotoUrl;
 
-    @ManyToOne(fetch = FetchType.LAZY) // Relación Muchos a Uno (Muchas fotos pertenecen a un mueble)
-    @JoinColumn(name = "mueble_id", nullable = false) // Columna de la clave foránea en MySQL
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mueble_id", nullable = false)
+    @JsonIgnore // Evita bucles infinitos al serializar a JSON
     private Mueble mueble;
+
+    // Constructor vacío
+    public FotoAdicional() {}
+
+    // Constructor completo
+    public FotoAdicional(Long id, String fotoUrl, Mueble mueble) {
+        this.id = id;
+        this.fotoUrl = fotoUrl;
+        this.mueble = mueble;
+    }
+
+    // Getters y Setters manuales
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getFotoUrl() { return fotoUrl; }
+    public void setFotoUrl(String fotoUrl) { this.fotoUrl = fotoUrl; }
+
+    public Mueble getMueble() { return mueble; }
+    public void setMueble(Mueble mueble) { this.mueble = mueble; }
 }
