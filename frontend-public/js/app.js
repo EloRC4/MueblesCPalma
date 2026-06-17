@@ -16,9 +16,9 @@ function cargarMuebles() {
             return response.json();
         })
         .then(muebles => {
-            contenedor.innerHTML = ""; // Limpiar el mensaje de "Cargando..."
+            contenedor.innerHTML = ""; // Limpiar el mensaje de carga
 
-            // Si la base de datos está vacía (como ahora)
+            // Si la base de datos está vacía
             if (muebles.length === 0) {
                 contenedor.innerHTML = `
                     <div class="sin-datos">
@@ -27,26 +27,34 @@ function cargarMuebles() {
                 return;
             }
 
-            // Si hay muebles, los recorremos y creamos sus tarjetas
-            // Busca esta sección dentro de tu js/app.js y reemplaza el trozo del foreach:
+            // Mapeo y renderizado de tarjetas
+
             muebles.forEach(mueble => {
                 const tarjeta = document.createElement("div");
                 tarjeta.classList.add("tarjeta-mueble");
 
+                const rutaImagen = mueble.fotoPrincipal ? `assets/${mueble.fotoPrincipal}` : 'assets/placeholder.jpg';
+
                 tarjeta.innerHTML = `
-        <span class="categoria-badge" style="background: #e74c3c; color: white; padding: 0.2rem 0.5rem; font-size: 0.8rem; border-radius: 4px;">${mueble.tipo}</span>
-        <h3 style="margin-top: 0.5rem;">${mueble.titulo}</h3>
-        <p>${mueble.descripcion}</p>
-        <small style="color: #7f8c8d;">Imagen: ${mueble.foto_principal}</small>
+        <div class="card-image-wrapper">
+            <img src="${rutaImagen}" alt="${mueble.titulo}" class="card-image" loading="lazy">
+            <span class="categoria-badge">${mueble.tipo}</span>
+        </div>
+        <div class="card-content">
+            <h3>${mueble.titulo}</h3>
+            <p>${mueble.descripcion}</p>
+            <a href="item.html?id=${mueble.id}" class="btn-detalle">Ver detalles</a>
+        </div>
     `;
 
                 contenedor.appendChild(tarjeta);
             });
+
         })
         .catch(error => {
             console.error("Error:", error);
             contenedor.innerHTML = `
-                <div class="sin-datos" style="color: #c0392b;">
+                <div class="sin-datos error">
                     <p>❌ No se pudo conectar con la API. Asegúrate de que el backend está corriendo.</p>
                 </div>`;
         });
