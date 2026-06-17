@@ -3,6 +3,7 @@ package com.mueblescpalma.api.models;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonManagedReference; // Importación correcta
 
 @Entity
 @Table(name = "muebles")
@@ -25,6 +26,7 @@ public class Mueble {
     private String fotoPrincipal;
 
     @OneToMany(mappedBy = "mueble", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference 
     private List<FotoAdicional> fotosAdicionales = new ArrayList<>();
 
     // Constructor vacío obligatorio para JPA
@@ -48,7 +50,8 @@ public class Mueble {
     public void setTitulo(String titulo) { this.titulo = titulo; }
 
     public String getDescripcion() { return descripcion; }
-public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+
     public String getTipo() { return tipo; }
     public void setTipo(String tipo) { this.tipo = tipo; }
 

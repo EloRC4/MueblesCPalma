@@ -1,10 +1,22 @@
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f6f9;
+    /* Puedes usar incluso la imagen original sin editar en GIMP */
+    background-image: url('../assets/Background.png');
+    
+    /* LA CLAVE: 'repeat-y' hace que se repita solo hacia abajo (vertical) */
+    background-repeat: repeat-y;
+    
+    /* EL TRUCO: 100% de ancho (fijo) y 'auto' de alto para que no se deforme */
+    background-size: 100% auto;
+    
+    /* Centramos el fondo en la pantalla */
+    background-position: top center;
+    
+    /* Mantiene el fondo acompañando al scroll del catálogo */
+    background-attachment: scroll;
+    
     margin: 0;
-    color: #333;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
-
 header {
     background-color: #2c3e50;
     color: white;
@@ -54,4 +66,131 @@ main {
     font-size: 1.2rem;
     color: #7f8c8d;
     padding: 3rem;
+}
+
+/* =============================================================================
+   Componente: Tarjetas de Catálogo de Muebles (Versión Compacta)
+   ============================================================================= */
+
+/* Contenedor del catálogo con límite de anchura para pantallas grandes */
+#contenedor-muebles {
+    display: grid;
+    /* Reducimos el mínimo a 220px para que quepan más tarjetas por fila */
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.5rem; /* Spacing un poco más ajustado y fino */
+    padding: 2rem;
+    
+    /* El truco maestro: no deja que el catálogo mida más de 1200px y lo centra */
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Estructura principal de la tarjeta */
+.tarjeta-mueble {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tarjeta-mueble:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Contenedor de la imagen: Reducimos la altura dramáticamente */
+.card-image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 150px; /* Bajado de 220px a 150px para que sea tipo foto de catálogo */
+    overflow: hidden;
+    background-color: #eaeded;
+}
+
+/* Ajuste proporcional de la imagen (sigue cubriendo sin deformarse) */
+.card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.tarjeta-mueble:hover .card-image {
+    transform: scale(1.03);
+}
+
+/* Etiqueta flotante de categoría (un poco más compacta) */
+.categoria-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: #e74c3c;
+    color: white;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+}
+
+/* Zona de textos de la tarjeta */
+.card-content {
+    padding: 1.2rem; /* Menos relleno para que no ocupe tanto espacio vertical */
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.card-content h3 {
+    margin: 0 0 0.4rem 0;
+    font-size: 1.1rem; /* Texto un pelo más pequeño y fino */
+    color: #2c3e50;
+}
+
+.card-content p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    line-height: 1.4;
+}
+
+/* Mensajes de carga, base de datos vacía o errores */
+.sin-datos {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 2rem;
+    font-size: 1.2rem;
+    color: #7f8c8d;
+}
+
+.sin-datos.error {
+    color: #c0392b;
+    font-weight: 500;
+}
+
+
+/* Contenedor del catálogo forzado a 2 columnas siempre */
+#contenedor-muebles {
+    display: grid;
+    /* Fuerza exactamente 2 columnas del mismo tamaño (1fr cada una) */
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem; /* Un poco más de espacio entre ellas queda mejor en este diseño */
+    padding: 2rem;
+    
+    /* Reducimos el ancho máximo total para que las 2 tarjetas no se estiren demasiado */
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Contenedor de la imagen reajustado para la nueva anchura */
+.card-image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 260px; /* Subido a 260px para que la proporción 2x2 se vea espectacular */
+    overflow: hidden;
+    background-color: #eaeded;
 }

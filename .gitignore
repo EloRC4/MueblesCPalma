@@ -5,6 +5,8 @@
 # compiled cue and OS garbage
 *.class
 *.log
+*.sh
+
 *.ctxt
 .DS_Store
 .cfignore
