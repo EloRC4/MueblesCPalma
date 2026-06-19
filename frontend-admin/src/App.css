@@ -1,0 +1,16 @@
+.container { padding: 20px; font-family: sans-serif; }
+.grid { 
+  display: grid; 
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+  gap: 20px; 
+}
+.card { 
+  border: 1px solid #ddd; 
+  border-radius: 8px; 
+  overflow: hidden; 
+  transition: transform 0.2s;
+}
+.card:hover { transform: scale(1.03); }
+.card img { width: 100%; height: 200px; object-fit: cover; }
+.card-content { padding: 15px; }
+.badge { background: #eee; padding: 4px 8px; border-radius: 4px; font-size: 0.8em; }

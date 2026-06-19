@@ -9,3 +9,19 @@ services:
       MYSQL_DATABASE: muebles_cpalma_db
       MYSQL_USER: dev_cpalma_user
       MYSQL_PASSWORD: dev_secure_password_2026
+    volumes:
+      - ./db_data:/var/lib/mysql
+
+  backend:
+    build: ../../backend
+    container_name: cpalma_backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    volumes:
+      - "/home/elo/Documentos/Muebles C Palma/frontend-public/assets:/app/uploads"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/muebles_cpalma_db
+      SPRING_DATASOURCE_USERNAME: dev_cpalma_user
+      SPRING_DATASOURCE_PASSWORD: dev_secure_password_2026

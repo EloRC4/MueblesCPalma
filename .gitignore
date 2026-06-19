@@ -6,6 +6,7 @@
 *.class
 *.log
 *.sh
+*.sdi
 
 *.ctxt
 .DS_Store
@@ -36,3 +37,5 @@ infrastructure/docker/mysql_data/
 node_modules/
 frontend/dist/
 frontend/.next/
+infrastructure/docker/db_data/
+
