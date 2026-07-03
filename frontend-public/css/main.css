@@ -22,7 +22,11 @@ html {
 
 body {
     margin: 0;
-    background: var(--surface);
+    background-image: url('../assets/Background.png');
+    background-repeat: repeat-y;
+    background-size: 100% auto;
+    background-position: top center;
+    background-attachment: scroll;
     color: var(--ink);
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
@@ -226,6 +230,22 @@ a {
     max-width: 680px;
     color: var(--muted);
     font-size: 1.1rem;
+}
+
+.catalog-page .contact-hero h1 {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-strong) 100%);
+    color: #fff;
+    padding: 0.8rem 1.2rem;
+    border-radius: 12px;
+    display: inline-block;
+}
+
+.catalog-page .contact-hero h1 {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-strong) 100%);
+    color: #fff;
+    padding: 0.8rem 1.2rem;
+    border-radius: 12px;
+    display: inline-block;
 }
 
 .contact-layout {

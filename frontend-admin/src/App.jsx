@@ -7,9 +7,9 @@ const UPLOAD_URL = 'http://localhost:8080/api/v1/uploads';
 const ASSETS_BASE_URL = 'http://localhost:3000/assets/';
 
 const ESTILOS_ADMIN = [
-  { id: 'clasico', nombre: 'Clásico', descripcion: 'Panel cálido y tradicional.' },
-  { id: 'moderno', nombre: 'Moderno', descripcion: 'Panel claro, limpio y contrastado.' },
-  { id: 'oscuro', nombre: 'Oscuro', descripcion: 'Panel sobrio para trabajar con menos brillo.' },
+  { id: 'clasico', nombre: 'Clásico' },
+  { id: 'moderno', nombre: 'Moderno' },
+  { id: 'oscuro', nombre: 'Oscuro' },
 ];
 
 function resolverImagen(foto) {
@@ -53,6 +53,7 @@ function App() {
   const [archivosAdicionales, setArchivosAdicionales] = useState([]);
 
   const [mostrarGestorCategorias, setMostrarGestorCategorias] = useState(false);
+  const [mostrarSelectorEstilos, setMostrarSelectorEstilos] = useState(false);
   const [nuevaCategoria, setNuevaCategoria] = useState('');
   const [estiloAdmin, setEstiloAdmin] = useState(() => localStorage.getItem('adminStyle') || 'clasico');
 
@@ -204,6 +205,9 @@ function App() {
       <div className="app-header">
         <h1>Muebles C Palma — Panel de Gestión</h1>
         <div style={{ display: 'flex', gap: '0.6rem' }}>
+          <button className="boton boton-secundario" onClick={() => setMostrarSelectorEstilos(true)}>
+            Estilo
+          </button>
           <button className="boton boton-secundario" onClick={() => setMostrarGestorCategorias(true)}>
             Categorías
           </button>
@@ -212,27 +216,6 @@ function App() {
           </button>
         </div>
       </div>
-
-      <section className="panel-estilos">
-        <div>
-          <h2>Estilo del panel privado</h2>
-          <p>Elige cómo se verá este backend privado de gestión.</p>
-        </div>
-        <div className="selector-estilos" aria-label="Selector de estilos del panel privado">
-          {ESTILOS_ADMIN.map((estilo) => (
-            <button
-              key={estilo.id}
-              type="button"
-              className={`estilo-opcion ${estiloAdmin === estilo.id ? 'activo' : ''}`}
-              onClick={() => setEstiloAdmin(estilo.id)}
-            >
-              <span className={`muestra-estilo muestra-${estilo.id}`} aria-hidden="true" />
-              <strong>{estilo.nombre}</strong>
-              <small>{estilo.descripcion}</small>
-            </button>
-          ))}
-        </div>
-      </section>
 
       {error && (
         <div className="mensaje-error">
@@ -363,6 +346,36 @@ function App() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: selector de estilos */}
+      {mostrarSelectorEstilos && (
+        <div className="overlay" onClick={() => setMostrarSelectorEstilos(false)}>
+          <div className="modal modal-estilos" onClick={(e) => e.stopPropagation()}>
+            <h2>Estilo del panel</h2>
+            <div className="selector-estilos" aria-label="Selector de estilos del panel privado">
+              {ESTILOS_ADMIN.map((estilo) => (
+                <button
+                  key={estilo.id}
+                  type="button"
+                  className={`estilo-opcion ${estiloAdmin === estilo.id ? 'activo' : ''}`}
+                  onClick={() => {
+                    setEstiloAdmin(estilo.id);
+                    setMostrarSelectorEstilos(false);
+                  }}
+                >
+                  <span className={`muestra-estilo muestra-${estilo.id}`} aria-hidden="true" />
+                  <strong>{estilo.nombre}</strong>
+                </button>
+              ))}
+            </div>
+            <div className="modal-acciones">
+              <button className="boton boton-secundario" onClick={() => setMostrarSelectorEstilos(false)}>
+                Cerrar
+              </button>
+            </div>
           </div>
         </div>
       )}

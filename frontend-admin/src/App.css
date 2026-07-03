@@ -74,15 +74,23 @@ body[data-admin-theme="oscuro"] {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 2rem;
   margin-bottom: 1.5rem;
-  border-bottom: 2px solid var(--admin-line);
   padding-bottom: 1rem;
 }
 
 .app-header h1 {
-  font-size: 1.6rem;
-  color: var(--admin-primary-dark);
+  font-size: 1.8rem;
+  color: white;
   margin: 0;
+  background: linear-gradient(135deg, var(--admin-primary) 0%, var(--admin-primary-dark) 100%);
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  box-shadow: var(--admin-shadow);
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  flex: 1;
+  min-width: 0;
 }
 
 .boton {
@@ -127,41 +135,22 @@ body[data-admin-theme="oscuro"] {
   margin-bottom: 1rem;
 }
 
-.panel-estilos {
-  background: var(--admin-surface);
-  border: 1px solid var(--admin-line);
-  border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 1.5rem;
-  box-shadow: var(--admin-shadow);
-}
-
-.panel-estilos h2 {
-  margin: 0 0 0.25rem;
-  color: var(--admin-primary-dark);
-  font-size: 1.1rem;
-}
-
-.panel-estilos p {
-  margin: 0 0 1rem;
-  color: var(--admin-muted);
-  font-size: 0.9rem;
+.modal-estilos {
+  max-width: 360px;
 }
 
 .selector-estilos {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-  gap: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .estilo-opcion {
-  display: grid;
-  grid-template-columns: 42px 1fr;
-  gap: 0.15rem 0.75rem;
+  display: flex;
   align-items: center;
+  gap: 0.75rem;
   width: 100%;
-  min-height: 76px;
-  padding: 0.75rem;
+  padding: 0.65rem 0.75rem;
   border: 1px solid var(--admin-line);
   border-radius: 8px;
   background: var(--admin-panel);
@@ -181,16 +170,10 @@ body[data-admin-theme="oscuro"] {
   font-size: 0.95rem;
 }
 
-.estilo-opcion small {
-  grid-column: 2;
-  color: var(--admin-muted);
-  line-height: 1.35;
-}
-
 .muestra-estilo {
-  grid-row: span 2;
-  width: 42px;
-  height: 42px;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
   border-radius: 6px;
   border: 1px solid rgba(0, 0, 0, 0.08);
 }
@@ -287,7 +270,12 @@ body[data-admin-theme="oscuro"] {
 
 .modal h2 {
   margin-top: 0;
-  color: var(--admin-primary-dark);
+  margin-bottom: 1.2rem;
+  color: white;
+  background: linear-gradient(135deg, var(--admin-primary) 0%, var(--admin-primary-dark) 100%);
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  font-size: 1.2rem;
 }
 
 .campo {
