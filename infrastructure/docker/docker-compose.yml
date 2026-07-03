@@ -9,3 +9,7 @@ services:
       MYSQL_DATABASE: muebles_cpalma_db
       MYSQL_USER: dev_cpalma_user
       MYSQL_PASSWORD: dev_secure_password_2026
+    volumes:
+      # Esta línea es la que falta. 
+      # Mapea tu script local a la carpeta de inicialización automática de MySQL
+      - ./init-db:/docker-entrypoint-initdb.d

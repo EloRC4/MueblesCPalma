@@ -1,5 +1,6 @@
 package com.mueblescpalma.api.services;
 
+import com.mueblescpalma.api.models.FotoAdicional;
 import com.mueblescpalma.api.models.Mueble;
 import com.mueblescpalma.api.repositories.MuebleRepository;
 import org.springframework.stereotype.Service;
@@ -55,7 +56,35 @@ public class MuebleService {
         }
         return muebleRepository.save(mueble);
     }
+    /**
+     * Actualiza los campos principales de un mueble existente.
+     * No modifica la galería de fotos adicionales en esta operación.
+     */
+    @Transactional
+    public Optional<Mueble> actualizar(Long id, Mueble datosActualizados) {
+        return muebleRepository.findById(id).map(muebleExistente -> {
+            muebleExistente.setTitulo(datosActualizados.getTitulo());
+            muebleExistente.setDescripcion(datosActualizados.getDescripcion());
+            muebleExistente.setTipo(datosActualizados.getTipo());
+            muebleExistente.setFotoPrincipal(datosActualizados.getFotoPrincipal());
+            return muebleRepository.save(muebleExistente);
+        });
+    }
 
+    /**
+     * Añade una nueva foto a la galería de un mueble existente sin tocar las demás.
+     */
+    @Transactional
+    public Optional<Mueble> agregarFotoAdicional(Long id, String fotoUrl) {
+        return muebleRepository.findById(id).map(mueble -> {
+            FotoAdicional nuevaFoto = new FotoAdicional();
+            nuevaFoto.setFotoUrl(fotoUrl);
+            nuevaFoto.setMueble(mueble);
+            mueble.getFotosAdicionales().add(nuevaFoto);
+            return muebleRepository.save(mueble);
+        });
+    }
+    
     /**
      * Elimina un mueble del catálogo por su ID.
      */

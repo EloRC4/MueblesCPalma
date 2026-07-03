@@ -33,7 +33,9 @@ function cargarMuebles() {
                 const tarjeta = document.createElement("div");
                 tarjeta.classList.add("tarjeta-mueble");
 
-                const rutaImagen = mueble.fotoPrincipal ? `assets/${mueble.fotoPrincipal}` : 'assets/placeholder.jpg';
+                const rutaImagen = mueble.fotoPrincipal
+                    ? (mueble.fotoPrincipal.startsWith('http') ? mueble.fotoPrincipal : `assets/${mueble.fotoPrincipal}`)
+                    : 'assets/placeholder.jpg';
 
                 tarjeta.innerHTML = `
         <div class="card-image-wrapper">

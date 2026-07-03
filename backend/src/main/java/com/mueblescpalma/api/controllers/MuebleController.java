@@ -5,15 +5,15 @@ import com.mueblescpalma.api.services.MuebleService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import java.util.Map;
 import java.util.List;
 
 @RestController // Le dice a Spring que esta clase es una API REST que devuelve datos en formato JSON
-@RequestMapping("/muebles") // Define la URL base. Recuerda que añadimos el prefijo /api/v1 en el application.yml
+@RequestMapping("/api/v1/muebles") // Define la URL base. Recuerda que añadimos el prefijo /api/v1 en el application.yml
 public class MuebleController {
 
     private final MuebleService muebleService;
-
+ 
     // Inyectamos el servicio mediante el constructor
     public MuebleController(MuebleService muebleService) {
         this.muebleService = muebleService;
@@ -65,5 +65,28 @@ public class MuebleController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build(); // Código HTTP 404 si el ID no existía
         }
+    }
+
+    /**
+     * Endpoint: PUT /api/v1/muebles/{id}
+     * Actualiza los datos principales de un mueble existente.
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<Mueble> actualizarMueble(@PathVariable Long id, @RequestBody Mueble muebleActualizado) {
+        return muebleService.actualizar(id, muebleActualizado)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    /**
+     * Endpoint: POST /api/v1/muebles/{id}/fotos
+     * Añade una nueva foto a la galería de un mueble existente.
+     */
+    @PostMapping("/{id}/fotos")
+    public ResponseEntity<Mueble> agregarFotoAdicional(@PathVariable Long id, @RequestBody Map<String, String> fotoData) {
+        String fotoUrl = fotoData.get("fotoUrl");
+        return muebleService.agregarFotoAdicional(id, fotoUrl)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

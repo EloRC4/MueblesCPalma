@@ -7,6 +7,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -21,20 +22,17 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // 1. Activar la configuración de CORS que definimos abajo
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            
-            // 2. Desactivar CSRF (No lo necesitamos para APIs REST que no usan cookies de sesión)
-            .csrf(AbstractHttpConfigurer::disable)
-            
-            // 3. Reglas de autorización de las URLs (El "Portero")
-            .authorizeHttpRequests(auth -> auth
-                // Permitir que CUALQUIERA vea los muebles (Catálogo público)
-                .requestMatchers(HttpMethod.GET, "/muebles/**").permitAll()
-                
-                // Cualquier otra petición (POST, DELETE, o paneles de administración) requerirá autenticación
-                .anyRequest().authenticated()
-            );
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(AbstractHttpConfigurer::disable) // Desactiva CSRF
+                // NUEVO: Aseguramos que la sesión no se guarde en cookies (Stateful ->
+                // Stateless)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/v1/muebles/**").permitAll()
+                        .requestMatchers("/api/v1/uploads/**").permitAll()
+                        .requestMatchers("/api/v1/categorias/**").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .anyRequest().authenticated());
 
         return http.build();
     }
@@ -46,16 +44,17 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        
+
         // Permitimos el origen del frontend local (por ejemplo, React, Vue o Next.js)
         configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:5173"));
-        
+
         // Permitimos los métodos HTTP estándares
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        
-        // Permitimos cualquier cabecera (Headers) como Authorization, Content-Type, etc.
+
+        // Permitimos cualquier cabecera (Headers) como Authorization, Content-Type,
+        // etc.
         configuration.setAllowedHeaders(List.of("*"));
-        
+
         // Permitir el envío de credenciales si fuera necesario
         configuration.setAllowCredentials(true);
 

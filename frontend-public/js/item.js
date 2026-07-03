@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     galeriaHtml += `
                         <div class="galeria-thumb-wrapper">
-                            <img src="${rutaSecundaria}" alt="Detante" class="galeria-thumb">
+                            <img src="${rutaSecundaria}" alt="Imagen adicional del mueble" class="galeria-thumb">
                         </div>`;
                 });
                 
@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <p><strong>Galería de imágenes:</strong></p>
                     ${galeriaHtml}
                     
-                    <a href="index.html" class="btn-volver">← Volver al Catálogo</a>
+                    <a href="catalogo.html" class="btn-volver">Volver al Catálogo</a>
                 </div>
             `;
         })

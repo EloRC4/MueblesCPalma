@@ -30,9 +30,18 @@ backend/*.war
 
 # Docker specific runtime exclusions
 infrastructure/docker/mysql_data/
+infrastructure/docker/db_data/
 *.env
 
 # Frontend / Node (For future phase)
 node_modules/
 frontend/dist/
 frontend/.next/
+
+# Ignore frontend public asset images
+frontend-public/assets/
+frontend-public/**/*.png
+frontend-public/**/*.jpg
+frontend-public/**/*.jpeg
+frontend-public/**/*.gif
+frontend-public/**/*.svg
