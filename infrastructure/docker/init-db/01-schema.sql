@@ -57,6 +57,15 @@ CREATE TABLE IF NOT EXISTS `fotos_adicionales` (
         ON DELETE CASCADE ON UPDATE CASCADE -- Enforces strict data consistency on deletions
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- -----------------------------------------------------------------------------
+-- 4. Table: categorias
+-- Description: Product categories managed from the private panel.
+-- -----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `categorias` (
+    `id` BIGINT AUTO_INCREMENT,
+    `nombre` VARCHAR(50) NOT NULL UNIQUE,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =============================================================================
 -- SEED DATA SECTION (Development Environment Mocking)
@@ -83,4 +92,8 @@ VALUES
 (1, 'https://images.unsplash.com/photo-1540518614846-7eded433c457'), -- Sofá detail 2
 (2, 'https://images.unsplash.com/photo-1615066390971-03e4e1c36ddf'), -- Mesa detail 1
 (2, 'https://images.unsplash.com/photo-1604014237800-1c9102c219da')  -- Mesa detail 2
+ON DUPLICATE KEY UPDATE `id`=`id`;
+
+INSERT INTO `categorias` (`nombre`)
+VALUES ('sofa'), ('mesa'), ('silla'), ('dormitorio'), ('decoracion')
 ON DUPLICATE KEY UPDATE `id`=`id`;
