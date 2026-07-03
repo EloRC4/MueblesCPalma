@@ -5,6 +5,7 @@
     --ink: #2f2924;
     --muted: #6f6258;
     --primary: #5d4037;
+    --primary-strong: #3b2823;
     --accent: #c97a36;
     --line: rgba(47, 41, 36, 0.14);
     --shadow: 0 16px 34px rgba(47, 41, 36, 0.12);
@@ -16,7 +17,7 @@
 
 body {
     margin: 0;
-    background-image: url('../assets/Background.png');
+    background-image: url('../images/Background.png');
     background-repeat: repeat-y;
     background-size: 100% auto;
     background-position: top center;
@@ -64,6 +65,24 @@ body {
 .nav-links a:hover,
 .nav-links a[aria-current="page"] {
     color: var(--accent);
+}
+
+.catalog-nav--dark {
+    background: var(--primary-strong);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.catalog-nav--dark .brand {
+    color: var(--surface);
+}
+
+.catalog-nav--dark .nav-links a {
+    color: rgba(255, 250, 243, 0.72);
+}
+
+.catalog-nav--dark .nav-links a:hover,
+.catalog-nav--dark .nav-links a[aria-current="page"] {
+    color: #f7d09a;
 }
 
 .catalog-header {
