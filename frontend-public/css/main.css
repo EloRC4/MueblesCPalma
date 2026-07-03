@@ -22,11 +22,7 @@ html {
 
 body {
     margin: 0;
-    background-image: url('../assets/Background.png');
-    background-repeat: repeat-y;
-    background-size: 100% auto;
-    background-position: top center;
-    background-attachment: scroll;
+    background: var(--surface);
     color: var(--ink);
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
