@@ -17,7 +17,9 @@
 
 body {
     margin: 0;
-    background-image: url('../images/Background.png');
+    /* Mosaico recortado a un múltiplo exacto del periodo del patrón
+       para que se repita verticalmente sin costuras */
+    background-image: url('../images/Background-tile.png');
     background-repeat: repeat-y;
     background-size: 100% auto;
     background-position: top center;
@@ -120,6 +122,127 @@ body {
 main {
     width: min(1120px, calc(100% - 10vw));
     margin: 3rem auto 4rem;
+}
+
+.filtros {
+    margin-bottom: 1.5rem;
+}
+
+.filtros-barra {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-filtros {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.1rem;
+    background: var(--primary);
+    border: none;
+    border-radius: 6px;
+    color: var(--surface);
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.btn-filtros:hover {
+    background: var(--primary-strong);
+}
+
+.btn-filtros .chevron {
+    display: inline-block;
+    transition: transform 0.2s ease;
+}
+
+.btn-filtros[aria-expanded="true"] .chevron {
+    transform: rotate(180deg);
+}
+
+.contador-resultados {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.92rem;
+    font-weight: 650;
+}
+
+.panel-filtros[hidden] {
+    display: none;
+}
+
+.panel-filtros {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr auto;
+    gap: 1rem;
+    align-items: end;
+    margin-top: 1rem;
+    padding: 1.25rem;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+}
+
+.campo-filtro {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.campo-filtro label {
+    color: var(--primary);
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.campo-filtro input,
+.campo-filtro select {
+    min-height: 42px;
+    padding: 0.5rem 0.75rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 0.95rem;
+}
+
+.campo-filtro input:focus,
+.campo-filtro select:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+    border-color: transparent;
+}
+
+.btn-limpiar {
+    min-height: 42px;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    color: var(--muted);
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-limpiar:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+}
+
+.sin-datos .btn-limpiar {
+    margin-top: 0.75rem;
 }
 
 #contenedor-muebles {
@@ -253,5 +376,10 @@ main {
 
     .catalog-header {
         padding-top: 3rem;
+    }
+
+    .panel-filtros {
+        grid-template-columns: 1fr;
+        align-items: stretch;
     }
 }
