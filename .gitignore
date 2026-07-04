@@ -38,10 +38,18 @@ node_modules/
 frontend/dist/
 frontend/.next/
 
-# Ignore frontend public asset images
-frontend-public/assets/
-frontend-public/**/*.png
-frontend-public/**/*.jpg
-frontend-public/**/*.jpeg
-frontend-public/**/*.gif
-frontend-public/**/*.svg
+# Frontend public images: ignore everything except the files the site
+# actually needs to render correctly (referenced from code or database)
+frontend-public/assets/*
+frontend-public/images/*
+!frontend-public/assets/mesa_main.jpg
+!frontend-public/assets/mesa_det1.jpg
+!frontend-public/assets/silla.jpg
+!frontend-public/assets/sofa_main.jpg
+!frontend-public/assets/sofa_det1.jpg
+!frontend-public/images/Background-tile.png
+!frontend-public/images/expo.jpg
+!frontend-public/images/fachada.jpg
+!frontend-public/images/salon.jpg
+!frontend-public/images/silla_main.jpg
+!frontend-public/images/sofa.jpg
