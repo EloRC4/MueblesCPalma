@@ -1,0 +1,67 @@
+# =============================================================================
+# Stack de producción - Muebles C Palma
+#
+# Levanta la aplicación completa en un único host:
+#   web   -> nginx con la web pública, el panel (/admin/) y proxy a la API
+#   api   -> backend Spring Boot (perfil prod)
+#   mysql -> base de datos con volumen persistente (sin puertos al exterior)
+#
+# Uso:
+#   cp .env.example .env   (y rellenar las contraseñas)
+#   docker compose -f docker-compose.prod.yml up -d --build
+# =============================================================================
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: cpalma_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Define MYSQL_ROOT_PASSWORD en el fichero .env}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-muebles_cpalma_db}
+      MYSQL_USER: ${MYSQL_USER:-cpalma_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Define MYSQL_PASSWORD en el fichero .env}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # Scripts de esquema y datos iniciales (solo se ejecutan con el volumen vacío)
+      - ./init-db:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  api:
+    build:
+      context: ../../backend
+    container_name: cpalma_api
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-muebles_cpalma_db}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8
+      DB_USERNAME: ${MYSQL_USER:-cpalma_user}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      APP_UPLOAD_DIR: /var/www/assets
+    volumes:
+      # Las imágenes subidas desde el panel se comparten con nginx
+      - uploads_data:/var/www/assets
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ../..
+      dockerfile: infrastructure/docker/web.Dockerfile
+    container_name: cpalma_web
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-80}:80"
+    volumes:
+      - uploads_data:/var/www/assets:ro
+    depends_on:
+      - api
+
+volumes:
+  mysql_data:
+  uploads_data:
