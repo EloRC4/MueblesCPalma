@@ -18,7 +18,7 @@ function personalizarEnlacesContacto(mueble) {
 
     const whatsapp = document.getElementById("accion-whatsapp");
     if (whatsapp) {
-        whatsapp.href = `https://wa.me/34917063847?text=${encodeURIComponent(mensaje)}`;
+        whatsapp.href = `https://wa.me/34646408588?text=${encodeURIComponent(mensaje)}`;
     }
 
     const correo = document.getElementById("accion-correo");
