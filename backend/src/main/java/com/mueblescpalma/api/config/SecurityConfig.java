@@ -1,6 +1,7 @@
 
 package com.mueblescpalma.api.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -21,6 +22,10 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity // Activa la seguridad web personalizada
 public class SecurityConfig {
+
+    // Orígenes autorizados para CORS, configurables por entorno
+    @Value("${app.cors.allowed-origins}")
+    private List<String> allowedOrigins;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -78,8 +83,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Permitimos el origen del frontend local (por ejemplo, React, Vue o Next.js)
-        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:5173"));
+        // Orígenes permitidos según el entorno (ver app.cors.allowed-origins)
+        configuration.setAllowedOrigins(allowedOrigins);
 
         // Permitimos los métodos HTTP estándares
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));

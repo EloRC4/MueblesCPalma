@@ -4,7 +4,7 @@
 // la búsqueda y la ordenación en el cliente.
 // ============================================================
 
-const API_URL = "http://localhost:8080/api/v1/muebles";
+const API_URL = `${API_BASE_URL}/muebles`;
 const RETRASO_BUSQUEDA_MS = 250;
 
 const FORMATO_PRECIO = new Intl.NumberFormat("es-ES", {

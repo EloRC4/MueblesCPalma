@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
-const API_URL = 'http://localhost:8080/api/v1/muebles';
-const CATEGORIAS_URL = 'http://localhost:8080/api/v1/categorias';
-const UPLOAD_URL = 'http://localhost:8080/api/v1/uploads';
-const AUTH_ME_URL = 'http://localhost:8080/api/v1/auth/me';
-const AUTH_PASSWORD_URL = 'http://localhost:8080/api/v1/auth/password';
-const ASSETS_BASE_URL = 'http://localhost:3000/assets/';
+// Las URLs se configuran por entorno (.env.development en local).
+// Los valores por defecto son rutas relativas pensadas para producción,
+// donde nginx sirve el panel y la API bajo el mismo dominio.
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api/v1';
+const ASSETS_BASE_URL = import.meta.env.VITE_ASSETS_BASE_URL ?? '/assets/';
+
+const API_URL = `${API_BASE_URL}/muebles`;
+const CATEGORIAS_URL = `${API_BASE_URL}/categorias`;
+const UPLOAD_URL = `${API_BASE_URL}/uploads`;
+const AUTH_ME_URL = `${API_BASE_URL}/auth/me`;
+const AUTH_PASSWORD_URL = `${API_BASE_URL}/auth/password`;
 
 const CLAVE_SESION = 'adminAuth';
 

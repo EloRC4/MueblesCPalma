@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8080/api/v1/muebles";
+const API_URL = `${API_BASE_URL}/muebles`;
 
 const FORMATO_PRECIO = new Intl.NumberFormat("es-ES", {
     style: "currency",
