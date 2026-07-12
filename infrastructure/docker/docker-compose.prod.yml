@@ -1,13 +1,13 @@
 # =============================================================================
-# Stack de producción - Muebles C Palma
+# Production stack - Muebles C Palma
 #
-# Levanta la aplicación completa en un único host:
-#   web   -> nginx con la web pública, el panel (/admin/) y proxy a la API
-#   api   -> backend Spring Boot (perfil prod)
-#   mysql -> base de datos con volumen persistente (sin puertos al exterior)
+# Runs the whole application on a single host:
+#   web   -> nginx with the public site, the panel (/admin/) and the API proxy
+#   api   -> Spring Boot backend (prod profile)
+#   mysql -> database with a persistent volume (not exposed to the host)
 #
-# Uso:
-#   cp .env.example .env   (y rellenar las contraseñas)
+# Usage:
+#   cp .env.example .env   (then fill in the passwords)
 #   docker compose -f docker-compose.prod.yml up -d --build
 # =============================================================================
 
@@ -17,13 +17,13 @@ services:
     container_name: cpalma_mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Define MYSQL_ROOT_PASSWORD en el fichero .env}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in the .env file}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-muebles_cpalma_db}
       MYSQL_USER: ${MYSQL_USER:-cpalma_user}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Define MYSQL_PASSWORD en el fichero .env}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in the .env file}
     volumes:
       - mysql_data:/var/lib/mysql
-      # Scripts de esquema y datos iniciales (solo se ejecutan con el volumen vacío)
+      # Schema and seed scripts (only executed on an empty volume)
       - ./init-db:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
@@ -43,7 +43,7 @@ services:
       DB_PASSWORD: ${MYSQL_PASSWORD}
       APP_UPLOAD_DIR: /var/www/assets
     volumes:
-      # Las imágenes subidas desde el panel se comparten con nginx
+      # Images uploaded from the panel are shared with nginx
       - uploads_data:/var/www/assets
     depends_on:
       mysql:

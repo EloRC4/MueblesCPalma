@@ -9,9 +9,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 /**
- * Conecta Spring Security con nuestra tabla `usuarios` de MySQL.
- * Cuando alguien intenta autenticarse, Spring llama a este servicio
- * para recuperar el usuario y comparar el hash BCrypt de la contraseña.
+ * Bridges Spring Security with the `usuarios` table in MySQL.
+ * On every authentication attempt Spring calls this service to load
+ * the user and match the submitted password against its BCrypt hash.
  */
 @Service
 public class UsuarioDetailsService implements UserDetailsService {

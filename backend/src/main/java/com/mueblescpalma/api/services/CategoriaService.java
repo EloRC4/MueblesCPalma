@@ -31,7 +31,7 @@ public class CategoriaService {
     }
 
     /**
-     * Elimina una categoría solo si ningún mueble la está usando.
+     * Deletes a category only if no furniture item is using it.
      */
     @Transactional
     public void eliminar(Long id) {

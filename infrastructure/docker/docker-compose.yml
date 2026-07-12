@@ -1,7 +1,7 @@
 # =============================================================================
-# Entorno de desarrollo - Muebles C Palma
-# Levanta únicamente MySQL; la API y los frontends se ejecutan en local.
-# El stack completo de producción está en docker-compose.prod.yml.
+# Development environment - Muebles C Palma
+# Starts MySQL only; the API and both frontends run locally.
+# The full production stack lives in docker-compose.prod.yml.
 # =============================================================================
 
 services:
@@ -16,9 +16,9 @@ services:
       MYSQL_USER: ${MYSQL_USER:-dev_cpalma_user}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-dev_secure_password_2026}
     volumes:
-      # Volumen con nombre: los datos sobreviven a recreaciones del contenedor
+      # Named volume: data survives container re-creation
       - mysql_data:/var/lib/mysql
-      # Scripts de esquema y datos iniciales (solo se ejecutan con el volumen vacío)
+      # Schema and seed scripts (only executed on an empty volume)
       - ./init-db:/docker-entrypoint-initdb.d
 
 volumes:

@@ -1,25 +1,25 @@
 # =============================================================================
-# Imagen de producción de la API - Muebles C Palma
-# Build multi-etapa: compila con Maven y ejecuta sobre un JRE ligero.
+# Production image for the API - Muebles C Palma
+# Multi-stage build: compiles with Maven and runs on a slim JRE.
 # =============================================================================
 
-# --- Etapa 1: compilación ---
+# --- Stage 1: build ---
 FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /workspace
 
-# Descargamos las dependencias primero para aprovechar la caché de Docker:
-# mientras el pom.xml no cambie, esta capa no se repite
+# Fetch dependencies first to leverage Docker layer caching:
+# this layer is only rebuilt when pom.xml changes
 COPY pom.xml .
 RUN mvn -q dependency:go-offline
 
 COPY src ./src
 RUN mvn -q package -DskipTests
 
-# --- Etapa 2: imagen final ---
+# --- Stage 2: runtime image ---
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
-# Usuario sin privilegios: la aplicación no necesita root
+# Unprivileged user: the application does not need root
 RUN addgroup -S spring && adduser -S spring -G spring \
     && mkdir -p /var/www/assets \
     && chown -R spring:spring /var/www/assets

@@ -18,9 +18,9 @@ public class UsuarioService {
     }
 
     /**
-     * Cambia la contraseña del usuario indicado.
-     * Exige la contraseña actual para evitar que una sesión abierta
-     * (u otra persona delante del ordenador) pueda cambiarla sin conocerla.
+     * Changes the given user's password.
+     * The current password is required so an open session (or anyone
+     * in front of the machine) cannot change it without knowing it.
      */
     @Transactional
     public void cambiarPassword(String username, String claveActual, String claveNueva) {
@@ -35,7 +35,7 @@ public class UsuarioService {
             throw new IllegalArgumentException("La nueva contraseña debe tener al menos 8 caracteres");
         }
 
-        // Nunca guardamos la contraseña en claro: siempre su hash BCrypt
+        // Never store the plain-text password, only its BCrypt hash
         usuario.setPassword(passwordEncoder.encode(claveNueva));
         usuarioRepository.save(usuario);
     }

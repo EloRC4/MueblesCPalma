@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface FotoAdicionalRepository extends JpaRepository<FotoAdicional, Long> {
-    // Al heredar de JpaRepository, ya tiene los métodos heredados listos para usarse
+    // The CRUD operations inherited from JpaRepository are all this entity needs
 }

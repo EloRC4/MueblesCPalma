@@ -26,7 +26,7 @@ public class Mueble {
     @Column(name = "foto_principal", nullable = false, length = 255)
     private String fotoPrincipal;
 
-    // Precio de venta en euros. Puede ser null: en la web se muestra como "Consultar precio"
+    // Retail price in euros. Nullable: the public site renders it as "price on request"
     @Column(precision = 10, scale = 2)
     private BigDecimal precio;
 
@@ -34,10 +34,10 @@ public class Mueble {
     @JsonManagedReference 
     private List<FotoAdicional> fotosAdicionales = new ArrayList<>();
 
-    // Constructor vacío obligatorio para JPA
+    // No-args constructor required by JPA
     public Mueble() {}
 
-    // Constructor completo
+    // Full constructor
     public Mueble(Long id, String titulo, String descripcion, String tipo, String fotoPrincipal, BigDecimal precio, List<FotoAdicional> fotosAdicionales) {
         this.id = id;
         this.titulo = titulo;
@@ -48,7 +48,7 @@ public class Mueble {
         this.fotosAdicionales = fotosAdicionales;
     }
 
-    // Getters y Setters manuales
+    // Getters and setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

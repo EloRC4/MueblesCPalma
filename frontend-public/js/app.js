@@ -1,7 +1,7 @@
 // ============================================================
-// Catálogo público — Muebles C Palma
-// Carga los muebles desde la API y gestiona el filtrado,
-// la búsqueda y la ordenación en el cliente.
+// Public catalog — Muebles C Palma
+// Loads the furniture from the API and handles filtering,
+// search and sorting on the client.
 // ============================================================
 
 const API_URL = `${API_BASE_URL}/muebles`;
@@ -12,8 +12,8 @@ const FORMATO_PRECIO = new Intl.NumberFormat("es-ES", {
     currency: "EUR",
 });
 
-// Estado de la aplicación: el catálogo completo se carga una sola
-// vez y los filtros se aplican en memoria sobre esta copia.
+// Application state: the full catalog is fetched once and every
+// filter operates in memory on this copy.
 const estado = {
     muebles: [],
     filtros: {
@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ------------------------------------------------------------
-// Carga de datos
+// Data loading
 // ------------------------------------------------------------
 
 async function cargarMuebles() {
@@ -49,13 +49,13 @@ async function cargarMuebles() {
         console.error("Error al cargar el catálogo:", error);
         contenedor.innerHTML = `
             <div class="sin-datos error">
-                <p>❌ No se pudo conectar con la API. Asegúrate de que el backend está corriendo.</p>
+                <p>❌ No se pudieron cargar los datos. Inténtelo de nuevo más tarde.</p>
             </div>`;
     }
 }
 
 // ------------------------------------------------------------
-// Filtros
+// Filters
 // ------------------------------------------------------------
 
 function inicializarFiltros() {
@@ -72,8 +72,8 @@ function inicializarFiltros() {
         panel.hidden = abierto;
     });
 
-    // La búsqueda se retrasa unos milisegundos (debounce) para no
-    // volver a renderizar la grid con cada pulsación de tecla.
+    // Search input is debounced so the grid is not re-rendered
+    // on every single keystroke.
     inputBusqueda.addEventListener(
         "input",
         debounce(() => {
@@ -103,8 +103,8 @@ function inicializarFiltros() {
     });
 }
 
-// Rellena el desplegable de tipos con los valores únicos que
-// existen realmente en el catálogo, ordenados alfabéticamente.
+// Fills the category dropdown with the unique values that actually
+// exist in the catalog, sorted alphabetically.
 function poblarSelectorDeTipos(muebles) {
     const selectTipo = document.getElementById("filtro-tipo");
     const tipos = [...new Set(muebles.map(mueble => mueble.tipo))]
@@ -145,7 +145,7 @@ function obtenerMueblesFiltrados() {
         filtrados.sort((a, b) => b.titulo.localeCompare(a.titulo, "es"));
     } else if (orden === "precio-asc" || orden === "precio-desc") {
         const direccion = orden === "precio-asc" ? 1 : -1;
-        // Los muebles sin precio se colocan siempre al final de la lista
+        // Items without a price always sink to the end of the list
         filtrados.sort((a, b) => {
             if (a.precio == null && b.precio == null) return 0;
             if (a.precio == null) return 1;
@@ -158,7 +158,7 @@ function obtenerMueblesFiltrados() {
 }
 
 // ------------------------------------------------------------
-// Renderizado
+// Rendering
 // ------------------------------------------------------------
 
 function renderizarMuebles(muebles) {
@@ -228,17 +228,17 @@ function actualizarContador(visibles, total) {
 }
 
 // ------------------------------------------------------------
-// Utilidades
+// Utilities
 // ------------------------------------------------------------
 
-// Devuelve el precio formateado en euros, o el texto alternativo
-// cuando el mueble no tiene precio asignado.
+// Returns the price formatted in euros, or the fallback text
+// when the item has no published price.
 function formatearPrecio(precio) {
     return precio == null ? "Consultar precio" : FORMATO_PRECIO.format(precio);
 }
 
-// Pasa el texto a minúsculas y elimina los acentos para que
-// "sillón" y "sillon" den el mismo resultado en la búsqueda.
+// Lowercases the text and strips accents so that "sillón" and
+// "sillon" produce the same search results.
 function normalizarTexto(texto) {
     return texto
         .toLowerCase()
@@ -246,8 +246,8 @@ function normalizarTexto(texto) {
         .replace(/[\u0300-\u036f]/g, "");
 }
 
-// Evita que el contenido de la base de datos se interprete como
-// HTML al insertarlo en las tarjetas.
+// Prevents database content from being interpreted as HTML
+// when injected into the cards.
 function escaparHtml(texto) {
     const div = document.createElement("div");
     div.textContent = String(texto ?? "");

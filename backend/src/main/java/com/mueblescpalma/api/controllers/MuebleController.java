@@ -8,20 +8,19 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 import java.util.List;
 
-@RestController // Le dice a Spring que esta clase es una API REST que devuelve datos en formato JSON
-@RequestMapping("/api/v1/muebles") // URL base con la API versionada
+@RestController
+@RequestMapping("/api/v1/muebles")
 public class MuebleController {
 
     private final MuebleService muebleService;
- 
-    // Inyectamos el servicio mediante el constructor
+
     public MuebleController(MuebleService muebleService) {
         this.muebleService = muebleService;
     }
 
     /**
-     * Endpoint: GET /api/v1/muebles O /api/v1/muebles?tipo=sofa
-     * Devuelve el catálogo completo o filtrado por categoría si se pasa el parámetro por la URL.
+     * Endpoint: GET /api/v1/muebles or /api/v1/muebles?tipo=sofa
+     * Returns the full catalog, optionally filtered by category.
      */
     @GetMapping
     public ResponseEntity<List<Mueble>> listarMuebles(@RequestParam(required = false) String tipo) {
@@ -33,43 +32,43 @@ public class MuebleController {
 
     /**
      * Endpoint: GET /api/v1/muebles/{id}
-     * Busca un mueble específico por su ID. Si no existe, devuelve un error 404 Not Found.
+     * Returns a single item by id, or 404 Not Found if it does not exist.
      */
     @GetMapping("/{id}")
     public ResponseEntity<Mueble> obtenerPorId(@PathVariable Long id) {
         return muebleService.obtenerPorId(id)
-                .map(ResponseEntity::ok) // Si el mueble existe, devuelve estatus 200 OK + el mueble
-                .orElseGet(() -> ResponseEntity.notFound().build()); // Si es null, devuelve 404
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     /**
      * Endpoint: POST /api/v1/muebles
-     * Recibe los datos de un nuevo mueble en formato JSON y los guarda en la base de datos.
+     * Creates a new furniture item from the JSON payload.
      */
     @PostMapping
     public ResponseEntity<Mueble> crearMueble(@RequestBody Mueble mueble) {
         Mueble nuevoMueble = muebleService.guardar(mueble);
-        // Devuelve un 201 Created junto con el objeto guardado (que ya incluye su ID autogenerado)
+        // 201 Created plus the stored object, which now carries its generated id
         return new ResponseEntity<>(nuevoMueble, HttpStatus.CREATED);
     }
 
     /**
      * Endpoint: DELETE /api/v1/muebles/{id}
-     * Elimina un mueble por su ID. Devuelve un estatus 204 No Content si la operación fue exitosa.
+     * Deletes an item by id. Returns 204 No Content on success.
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarMueble(@PathVariable Long id) {
         try {
             muebleService.eliminar(id);
-            return ResponseEntity.noContent().build(); // Código HTTP 204: Éxito, pero no hay datos que devolver
+            return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build(); // Código HTTP 404 si el ID no existía
+            return ResponseEntity.notFound().build();
         }
     }
 
     /**
      * Endpoint: PUT /api/v1/muebles/{id}
-     * Actualiza los datos principales de un mueble existente.
+     * Updates the main fields of an existing item.
      */
     @PutMapping("/{id}")
     public ResponseEntity<Mueble> actualizarMueble(@PathVariable Long id, @RequestBody Mueble muebleActualizado) {
@@ -80,7 +79,7 @@ public class MuebleController {
 
     /**
      * Endpoint: POST /api/v1/muebles/{id}/fotos
-     * Añade una nueva foto a la galería de un mueble existente.
+     * Adds a new photo to the gallery of an existing item.
      */
     @PostMapping("/{id}/fotos")
     public ResponseEntity<Mueble> agregarFotoAdicional(@PathVariable Long id, @RequestBody Map<String, String> fotoData) {

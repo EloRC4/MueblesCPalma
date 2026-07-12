@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
-// Las URLs se configuran por entorno (.env.development en local).
-// Los valores por defecto son rutas relativas pensadas para producción,
-// donde nginx sirve el panel y la API bajo el mismo dominio.
+// URLs are configured per environment (.env.development locally).
+// The defaults are relative paths meant for production, where nginx
+// serves the panel and the API under the same domain.
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api/v1';
 const ASSETS_BASE_URL = import.meta.env.VITE_ASSETS_BASE_URL ?? '/assets/';
 
@@ -15,8 +15,8 @@ const AUTH_PASSWORD_URL = `${API_BASE_URL}/auth/password`;
 
 const CLAVE_SESION = 'adminAuth';
 
-// Devuelve la cabecera Authorization con las credenciales guardadas
-// al iniciar sesión. El backend las exige en toda operación de escritura.
+// Returns the Authorization header with the credentials stored at
+// login time. The backend requires them on every write operation.
 function cabecerasAuth() {
   const token = sessionStorage.getItem(CLAVE_SESION);
   return token ? { Authorization: `Basic ${token}` } : {};
@@ -48,15 +48,15 @@ async function subirArchivo(file) {
   return data.filename;
 }
 
-// Construye un Error con .codigo (status HTTP) y .mensaje legible,
-// intentando leer el cuerpo JSON de error que devuelve el backend.
+// Builds an Error carrying .codigo (HTTP status) and a readable message,
+// trying to parse the JSON error body returned by the backend.
 async function crearErrorDesdeRespuesta(res, mensajePorDefecto) {
   let mensaje = mensajePorDefecto;
   try {
     const cuerpo = await res.json();
     if (cuerpo && cuerpo.mensaje) mensaje = cuerpo.mensaje;
   } catch {
-    // El cuerpo no era JSON, nos quedamos con el mensaje por defecto
+    // Body was not JSON; keep the default message
   }
   const error = new Error(mensaje);
   error.codigo = res.status;
@@ -105,7 +105,7 @@ function App() {
   }, [estiloAdmin]);
 
   function mostrarError(err) {
-    // Si el backend rechaza las credenciales, volvemos a la pantalla de login
+    // If the backend rejects the credentials, go back to the login screen
     if (err.codigo === 401) {
       cerrarSesion('Tu sesión ya no es válida. Vuelve a iniciar sesión.');
       return;
@@ -118,8 +118,8 @@ function App() {
     setComprobandoLogin(true);
     setErrorLogin(null);
 
-    // Comprobamos las credenciales contra un endpoint protegido:
-    // si el backend responde 200 son válidas, si responde 401 no lo son
+    // Validate the credentials against a protected endpoint:
+    // 200 means they are valid, 401 means they are not
     const token = btoa(`${usuarioLogin}:${claveLogin}`);
     try {
       const res = await fetch(AUTH_ME_URL, { headers: { Authorization: `Basic ${token}` } });
@@ -175,8 +175,8 @@ function App() {
       });
       if (!res.ok) throw await crearErrorDesdeRespuesta(res, 'No se pudo cambiar la contraseña');
 
-      // Renovamos las credenciales guardadas para que la sesión siga
-      // funcionando sin obligar a entrar de nuevo
+      // Refresh the stored credentials so the session keeps working
+      // without forcing a new login
       const credenciales = atob(sessionStorage.getItem(CLAVE_SESION));
       const username = credenciales.slice(0, credenciales.indexOf(':'));
       const tokenNuevo = btoa(`${username}:${claveNueva}`);
@@ -251,8 +251,8 @@ function App() {
     try {
       const datosMueble = { ...muebleEnEdicion };
 
-      // El input devuelve el precio como texto: lo convertimos a número,
-      // o lo dejamos en null si se deja vacío (mueble sin precio publicado)
+      // The input yields the price as text: convert it to a number,
+      // or keep null when left empty (item without a published price)
       datosMueble.precio =
         datosMueble.precio === '' || datosMueble.precio == null
           ? null
@@ -330,8 +330,8 @@ function App() {
       .catch(mostrarError);
   }
 
-  // Sin sesión iniciada solo se muestra la pantalla de acceso:
-  // el backend rechaza igualmente cualquier escritura sin credenciales
+  // Without a session only the login screen is rendered; the backend
+  // rejects any write without credentials regardless
   if (!sesion) {
     return (
       <div className={`app-contenedor tema-admin-${estiloAdmin}`}>
@@ -443,7 +443,7 @@ function App() {
         </table>
       )}
 
-      {/* Modal: crear/editar mueble */}
+      {/* Modal: create/edit furniture item */}
       {muebleEnEdicion && (
         <div className="overlay" onClick={cerrarFormulario}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
@@ -541,7 +541,7 @@ function App() {
         </div>
       )}
 
-      {/* Modal: selector de estilos */}
+      {/* Modal: theme picker */}
       {mostrarSelectorEstilos && (
         <div className="overlay" onClick={() => setMostrarSelectorEstilos(false)}>
           <div className="modal modal-estilos" onClick={(e) => e.stopPropagation()}>
@@ -571,7 +571,7 @@ function App() {
         </div>
       )}
 
-      {/* Modal: cambiar contraseña */}
+      {/* Modal: change password */}
       {mostrarCambioClave && (
         <div className="overlay" onClick={() => setMostrarCambioClave(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
@@ -636,7 +636,7 @@ function App() {
         </div>
       )}
 
-      {/* Modal: gestionar categorías */}
+      {/* Modal: manage categories */}
       {mostrarGestorCategorias && (
         <div className="overlay" onClick={() => setMostrarGestorCategorias(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>

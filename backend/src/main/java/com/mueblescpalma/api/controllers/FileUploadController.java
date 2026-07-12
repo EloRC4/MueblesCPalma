@@ -21,8 +21,8 @@ public class FileUploadController {
     private String uploadDir;
 
     /**
-     * Recibe un archivo de imagen y lo guarda con un nombre único
-     * en la carpeta de assets del frontend público.
+     * Receives an image file and stores it under a unique name
+     * in the public frontend assets folder.
      */
     @PostMapping
     public ResponseEntity<Map<String, String>> subirImagen(@RequestParam("file") MultipartFile file) {

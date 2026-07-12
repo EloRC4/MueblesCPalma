@@ -1,5 +1,5 @@
-// Lightbox compartido: amplía imágenes <img> y los fondos de las secciones
-// destacadas (hero, salón, expo) al hacer clic sobre ellas.
+// Shared lightbox: enlarges <img> elements and the background images
+// of the featured sections (hero, living room, showroom) on click.
 (() => {
     const style = document.createElement("style");
     style.textContent = `

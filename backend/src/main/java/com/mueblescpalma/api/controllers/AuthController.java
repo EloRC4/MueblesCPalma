@@ -23,8 +23,8 @@ public class AuthController {
 
     /**
      * Endpoint: GET /api/v1/auth/me
-     * Endpoint protegido que el panel de gestión usa para comprobar credenciales:
-     * si las credenciales enviadas son válidas devuelve el usuario, si no, 401.
+     * Protected endpoint the admin panel uses to validate credentials:
+     * returns the authenticated username, or 401 if the credentials are invalid.
      */
     @GetMapping("/me")
     public ResponseEntity<Map<String, String>> usuarioActual(Authentication authentication) {
@@ -33,9 +33,9 @@ public class AuthController {
 
     /**
      * Endpoint: PUT /api/v1/auth/password
-     * Cambia la contraseña del usuario autenticado. Recibe la contraseña
-     * actual (para verificarla) y la nueva. Devuelve 400 si la actual no
-     * es correcta o la nueva no cumple los requisitos.
+     * Changes the authenticated user's password. Expects the current
+     * password (verified before applying the change) and the new one.
+     * Returns 400 if the current password is wrong or the new one is invalid.
      */
     @PutMapping("/password")
     public ResponseEntity<Map<String, String>> cambiarPassword(

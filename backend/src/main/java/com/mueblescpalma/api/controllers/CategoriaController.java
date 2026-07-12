@@ -36,7 +36,7 @@ public class CategoriaController {
             categoriaService.eliminar(id);
             return ResponseEntity.noContent().build();
         } catch (IllegalStateException e) {
-            // 409 Conflict: la categoría está en uso
+            // 409 Conflict: the category is still in use
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("mensaje", e.getMessage()));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("mensaje", e.getMessage()));

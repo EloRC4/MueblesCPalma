@@ -13,14 +13,14 @@ public class Usuario {
     @Column(nullable = false, unique = true, length = 50)
     private String username;
 
-    // Guarda el hash BCrypt de la contraseña, nunca el texto plano
+    // Stores the BCrypt hash of the password, never the plain text
     @Column(nullable = false, length = 255)
     private String password;
 
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
-    // Constructor vacío obligatorio para JPA
+    // No-args constructor required by JPA
     public Usuario() {}
 
     public Usuario(Long id, String username, String password, String email) {
@@ -30,7 +30,7 @@ public class Usuario {
         this.email = email;
     }
 
-    // Getters y Setters manuales
+    // Getters and setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

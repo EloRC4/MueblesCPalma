@@ -1,5 +1,5 @@
-# Contexto de build de las imágenes Docker: excluir todo lo que
-# no forma parte de los artefactos servidos
+# Docker build context: exclude everything that is not part of the
+# served artifacts
 .git
 .gitignore
 docs
@@ -10,5 +10,5 @@ backend/target
 frontend-admin/node_modules
 frontend-admin/dist
 
-# Fotos originales de cámara (se versionan solo las versiones web)
+# Original camera photos (only the web-sized versions are tracked)
 frontend-public/images/originales

@@ -11,8 +11,8 @@ CREATE DATABASE IF NOT EXISTS `muebles_cpalma_db`
 
 USE `muebles_cpalma_db`;
 
--- El cliente que ejecuta los scripts de inicialización debe leerlos como
--- UTF-8 para que los acentos de los datos de ejemplo se almacenen bien
+-- The client running the init scripts must read them as UTF-8 so the
+-- accented characters in the seed data are stored correctly
 SET NAMES utf8mb4;
 
 -- -----------------------------------------------------------------------------

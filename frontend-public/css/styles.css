@@ -17,8 +17,8 @@
 
 body {
     margin: 0;
-    /* Mosaico recortado a un múltiplo exacto del periodo del patrón
-       para que se repita verticalmente sin costuras */
+    /* Tile cropped to an exact multiple of the pattern period so it
+       repeats vertically without visible seams */
     background-image: url('../images/Background-tile.png');
     background-repeat: repeat-y;
     background-size: 100% auto;

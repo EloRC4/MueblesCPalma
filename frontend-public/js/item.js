@@ -5,14 +5,14 @@ const FORMATO_PRECIO = new Intl.NumberFormat("es-ES", {
     currency: "EUR",
 });
 
-// Devuelve el precio formateado en euros, o el texto alternativo
-// cuando el mueble no tiene precio asignado.
+// Returns the price formatted in euros, or the fallback text
+// when the item has no published price.
 function formatearPrecio(precio) {
     return precio == null ? "Consultar precio en tienda" : FORMATO_PRECIO.format(precio);
 }
 
-// Rellena los enlaces de WhatsApp y correo con un mensaje que ya
-// menciona el mueble que el visitante está viendo.
+// Pre-fills the WhatsApp and e-mail links with a message that
+// already mentions the item the visitor is looking at.
 function personalizarEnlacesContacto(mueble) {
     const mensaje = `Hola, me interesa el mueble «${mueble.titulo}» que he visto en vuestra web.`;
 
@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return response.json();
         })
         .then(mueble => {
-            // La foto puede ser una URL absoluta o un archivo local de assets/
+            // The photo may be an absolute URL or a local file under assets/
             const rutaImagen = mueble.fotoPrincipal.startsWith('http')
                 ? mueble.fotoPrincipal
                 : `assets/${mueble.fotoPrincipal}`;
@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 galeriaHtml = `<div class="item-galeria">`;
                 
                 mueble.fotosAdicionales.forEach(fotoObj => {
-                    // Validar también si las fotos secundarias son URLs externas
+                    // Gallery photos may also be external URLs
                     const rutaSecundaria = fotoObj.fotoUrl.startsWith('http') 
                         ? fotoObj.fotoUrl 
                         : `assets/${fotoObj.fotoUrl}`;
@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 galeriaHtml = `<p class="sin-fotos">No hay imágenes adicionales para este modelo.</p>`;
             }
 
-            // Pintar los campos con los nombres exactos de tu entidad
+            // Render the item details
             contenedor.innerHTML = `
                 <div class="item-imagen-box">
                     <img src="${rutaImagen}" alt="${mueble.titulo}">

@@ -20,10 +20,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 
 @Configuration
-@EnableWebSecurity // Activa la seguridad web personalizada
+@EnableWebSecurity
 public class SecurityConfig {
 
-    // Orígenes autorizados para CORS, configurables por entorno
+    // Browser origins allowed by CORS, configurable per environment
     @Value("${app.cors.allowed-origins}")
     private List<String> allowedOrigins;
 
@@ -31,32 +31,32 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(AbstractHttpConfigurer::disable) // Desactiva CSRF
-                // Aseguramos que la sesión no se guarde en cookies (Stateful -> Stateless)
+                // CSRF is not needed: the API is stateless and uses no session cookies
+                .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // El navegador manda OPTIONS antes de cada petición cross-origin (preflight)
+                        // Browsers send an OPTIONS preflight before cross-origin requests
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        // Catálogo público: cualquiera puede LEER muebles y categorías
+                        // Public catalog: anyone can READ furniture and categories
                         .requestMatchers(HttpMethod.GET, "/api/v1/muebles/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/categorias/**").permitAll()
-                        // La página interna de error de Spring debe ser accesible para
-                        // que un JSON malformado devuelva 400 y no un 403 engañoso
+                        // Spring's internal error page must stay reachable so a
+                        // malformed JSON body yields a 400 instead of a misleading 403
                         .requestMatchers("/error").permitAll()
-                        // Todo lo demás (POST/PUT/DELETE, subidas de imágenes, /auth/me)
-                        // exige un usuario válido de la tabla `usuarios`
+                        // Everything else (POST/PUT/DELETE, uploads, /auth/me)
+                        // requires a valid user from the `usuarios` table
                         .anyRequest().authenticated())
-                // Autenticación HTTP Basic: el panel de gestión manda las credenciales
-                // en la cabecera Authorization de cada petición de escritura
+                // HTTP Basic: the admin panel sends the credentials in the
+                // Authorization header of every write request
                 .httpBasic(basic -> basic.authenticationEntryPoint(entryPointSinPopup()));
 
         return http.build();
     }
 
     /**
-     * Respuesta 401 en JSON sin la cabecera WWW-Authenticate.
-     * Si se devolviera esa cabecera, el navegador mostraría su diálogo
-     * de login nativo encima del panel de gestión.
+     * Plain JSON 401 response without the WWW-Authenticate header.
+     * Returning that header would make the browser pop its native
+     * login dialog on top of the admin panel.
      */
     private AuthenticationEntryPoint entryPointSinPopup() {
         return (request, response, authException) -> {
@@ -67,8 +67,8 @@ public class SecurityConfig {
     }
 
     /**
-     * Algoritmo con el que se comparan las contraseñas de la tabla `usuarios`.
-     * Los hashes almacenados se generaron con BCrypt.
+     * Algorithm used to match passwords against the `usuarios` table.
+     * Stored hashes were generated with BCrypt.
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -76,28 +76,24 @@ public class SecurityConfig {
     }
 
     /**
-     * Configuración del CORS (Cross-Origin Resource Sharing)
-     * Define quién tiene permiso para llamar a este backend desde un navegador.
+     * CORS (Cross-Origin Resource Sharing) configuration.
+     * Defines which browser origins may call this API.
      */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Orígenes permitidos según el entorno (ver app.cors.allowed-origins)
+        // Allowed origins per environment (see app.cors.allowed-origins)
         configuration.setAllowedOrigins(allowedOrigins);
 
-        // Permitimos los métodos HTTP estándares
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
-        // Permitimos cualquier cabecera (Headers) como Authorization, Content-Type,
-        // etc.
+        // Any header is fine (Authorization, Content-Type, ...)
         configuration.setAllowedHeaders(List.of("*"));
 
-        // Permitir el envío de credenciales si fuera necesario
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        // Aplicamos esta traducción de seguridad a todos los endpoints de la API
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }

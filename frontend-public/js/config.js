@@ -1,10 +1,10 @@
 // ============================================================
-// Configuración de entorno del frontend público.
+// Environment configuration for the public frontend.
 //
-// En desarrollo el sitio se sirve con un servidor estático en el
-// puerto 3000 y la API corre aparte en el 8080. En producción,
-// nginx sirve la web y hace de proxy de /api/v1 hacia el backend,
-// por lo que basta con una ruta relativa al mismo origen.
+// In development the site is served by a static server on port
+// 3000 while the API runs separately on 8080. In production,
+// nginx serves the site and proxies /api/v1 to the backend, so
+// a same-origin relative path is all we need.
 // ============================================================
 
 const API_BASE_URL = window.location.port === "3000"
