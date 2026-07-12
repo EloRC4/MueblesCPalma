@@ -44,12 +44,11 @@ document.addEventListener("DOMContentLoaded", () => {
             return response.json();
         })
         .then(mueble => {
-            // 🔄 Solución al Culpable 1: Comprobar si la foto principal es una URL externa
-            const rutaImagen = mueble.fotoPrincipal.startsWith('http') 
-                ? mueble.fotoPrincipal 
+            // La foto puede ser una URL absoluta o un archivo local de assets/
+            const rutaImagen = mueble.fotoPrincipal.startsWith('http')
+                ? mueble.fotoPrincipal
                 : `assets/${mueble.fotoPrincipal}`;
 
-            // 🔄 Solución al Culpable 2: Adaptar al mapeo real de tu base de datos (fotosAdicionales -> fotoUrl)
             let galeriaHtml = "";
             
             if (mueble.fotosAdicionales && mueble.fotosAdicionales.length > 0) {

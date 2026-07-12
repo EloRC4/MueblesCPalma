@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.List;
 
 @RestController // Le dice a Spring que esta clase es una API REST que devuelve datos en formato JSON
-@RequestMapping("/api/v1/muebles") // Define la URL base. Recuerda que añadimos el prefijo /api/v1 en el application.yml
+@RequestMapping("/api/v1/muebles") // URL base con la API versionada
 public class MuebleController {
 
     private final MuebleService muebleService;
@@ -49,7 +49,7 @@ public class MuebleController {
     @PostMapping
     public ResponseEntity<Mueble> crearMueble(@RequestBody Mueble mueble) {
         Mueble nuevoMueble = muebleService.guardar(mueble);
-        // Devuelve un estatus 21 Created junto con el objeto guardado (que ahora incluye su ID autogenerado)
+        // Devuelve un 201 Created junto con el objeto guardado (que ya incluye su ID autogenerado)
         return new ResponseEntity<>(nuevoMueble, HttpStatus.CREATED);
     }
 

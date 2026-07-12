@@ -91,7 +91,7 @@ public class MuebleService {
      */
     @Transactional
     public void eliminar(Long id) {
-        // Verificamos si existe antes de intentar borrar para evitar excepciones feas
+        // Comprobamos la existencia antes de borrar para poder devolver un 404 controlado
         if (muebleRepository.existsById(id)) {
             muebleRepository.deleteById(id);
         } else {
