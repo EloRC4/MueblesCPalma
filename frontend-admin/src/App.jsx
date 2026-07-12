@@ -4,7 +4,17 @@ import './App.css';
 const API_URL = 'http://localhost:8080/api/v1/muebles';
 const CATEGORIAS_URL = 'http://localhost:8080/api/v1/categorias';
 const UPLOAD_URL = 'http://localhost:8080/api/v1/uploads';
+const AUTH_ME_URL = 'http://localhost:8080/api/v1/auth/me';
 const ASSETS_BASE_URL = 'http://localhost:3000/assets/';
+
+const CLAVE_SESION = 'adminAuth';
+
+// Devuelve la cabecera Authorization con las credenciales guardadas
+// al iniciar sesión. El backend las exige en toda operación de escritura.
+function cabecerasAuth() {
+  const token = sessionStorage.getItem(CLAVE_SESION);
+  return token ? { Authorization: `Basic ${token}` } : {};
+}
 
 const ESTILOS_ADMIN = [
   { id: 'clasico', nombre: 'Clásico' },
@@ -26,7 +36,7 @@ function formatearPrecio(precio) {
 async function subirArchivo(file) {
   const formData = new FormData();
   formData.append('file', file);
-  const res = await fetch(UPLOAD_URL, { method: 'POST', body: formData });
+  const res = await fetch(UPLOAD_URL, { method: 'POST', headers: cabecerasAuth(), body: formData });
   if (!res.ok) throw await crearErrorDesdeRespuesta(res, 'Error al subir la imagen');
   const data = await res.json();
   return data.filename;
@@ -48,6 +58,12 @@ async function crearErrorDesdeRespuesta(res, mensajePorDefecto) {
 }
 
 function App() {
+  const [sesion, setSesion] = useState(() => sessionStorage.getItem(CLAVE_SESION));
+  const [usuarioLogin, setUsuarioLogin] = useState('');
+  const [claveLogin, setClaveLogin] = useState('');
+  const [errorLogin, setErrorLogin] = useState(null);
+  const [comprobandoLogin, setComprobandoLogin] = useState(false);
+
   const [muebles, setMuebles] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -64,9 +80,10 @@ function App() {
   const [estiloAdmin, setEstiloAdmin] = useState(() => localStorage.getItem('adminStyle') || 'clasico');
 
   useEffect(() => {
+    if (!sesion) return;
     cargarMuebles();
     cargarCategorias();
-  }, []);
+  }, [sesion]);
 
   useEffect(() => {
     localStorage.setItem('adminStyle', estiloAdmin);
@@ -74,7 +91,43 @@ function App() {
   }, [estiloAdmin]);
 
   function mostrarError(err) {
+    // Si el backend rechaza las credenciales, volvemos a la pantalla de login
+    if (err.codigo === 401) {
+      cerrarSesion('Tu sesión ya no es válida. Vuelve a iniciar sesión.');
+      return;
+    }
     setError({ codigo: err.codigo ?? '—', mensaje: err.message });
+  }
+
+  async function iniciarSesion(e) {
+    e.preventDefault();
+    setComprobandoLogin(true);
+    setErrorLogin(null);
+
+    // Comprobamos las credenciales contra un endpoint protegido:
+    // si el backend responde 200 son válidas, si responde 401 no lo son
+    const token = btoa(`${usuarioLogin}:${claveLogin}`);
+    try {
+      const res = await fetch(AUTH_ME_URL, { headers: { Authorization: `Basic ${token}` } });
+      if (!res.ok) {
+        throw new Error(res.status === 401 ? 'Usuario o contraseña incorrectos' : 'No se pudo conectar con el servidor');
+      }
+      sessionStorage.setItem(CLAVE_SESION, token);
+      setClaveLogin('');
+      setSesion(token);
+    } catch (err) {
+      setErrorLogin(err.message);
+    } finally {
+      setComprobandoLogin(false);
+    }
+  }
+
+  function cerrarSesion(mensaje = null) {
+    sessionStorage.removeItem(CLAVE_SESION);
+    setSesion(null);
+    setErrorLogin(mensaje);
+    setError(null);
+    cerrarFormulario();
   }
 
   function cargarMuebles() {
@@ -151,7 +204,7 @@ function App() {
 
       const res = await fetch(url, {
         method: metodo,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...cabecerasAuth() },
         body: JSON.stringify(datosMueble),
       });
       if (!res.ok) throw await crearErrorDesdeRespuesta(res, 'Error al guardar el mueble');
@@ -161,7 +214,7 @@ function App() {
         const nombreGuardado = await subirArchivo(archivo);
         await fetch(`${API_URL}/${muebleGuardado.id}/fotos`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', ...cabecerasAuth() },
           body: JSON.stringify({ fotoUrl: nombreGuardado }),
         });
       }
@@ -179,7 +232,7 @@ function App() {
     const confirmar = window.confirm('¿Seguro que quieres eliminar este mueble?');
     if (!confirmar) return;
 
-    fetch(`${API_URL}/${id}`, { method: 'DELETE' })
+    fetch(`${API_URL}/${id}`, { method: 'DELETE', headers: cabecerasAuth() })
       .then(async (res) => {
         if (!res.ok) throw await crearErrorDesdeRespuesta(res, 'Error al eliminar el mueble');
         cargarMuebles();
@@ -193,7 +246,7 @@ function App() {
 
     fetch(CATEGORIAS_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...cabecerasAuth() },
       body: JSON.stringify({ nombre: nuevaCategoria }),
     })
       .then(async (res) => {
@@ -205,12 +258,52 @@ function App() {
   }
 
   function eliminarCategoria(id) {
-    fetch(`${CATEGORIAS_URL}/${id}`, { method: 'DELETE' })
+    fetch(`${CATEGORIAS_URL}/${id}`, { method: 'DELETE', headers: cabecerasAuth() })
       .then(async (res) => {
         if (!res.ok) throw await crearErrorDesdeRespuesta(res, 'Error al eliminar la categoría');
         cargarCategorias();
       })
       .catch(mostrarError);
+  }
+
+  // Sin sesión iniciada solo se muestra la pantalla de acceso:
+  // el backend rechaza igualmente cualquier escritura sin credenciales
+  if (!sesion) {
+    return (
+      <div className={`app-contenedor tema-admin-${estiloAdmin}`}>
+        <div className="login-panel">
+          <h1>Muebles C Palma</h1>
+          <p>Panel de gestión — acceso restringido</p>
+          <form onSubmit={iniciarSesion}>
+            <div className="campo">
+              <label>Usuario</label>
+              <input
+                type="text"
+                value={usuarioLogin}
+                onChange={(e) => setUsuarioLogin(e.target.value)}
+                autoComplete="username"
+                required
+                autoFocus
+              />
+            </div>
+            <div className="campo">
+              <label>Contraseña</label>
+              <input
+                type="password"
+                value={claveLogin}
+                onChange={(e) => setClaveLogin(e.target.value)}
+                autoComplete="current-password"
+                required
+              />
+            </div>
+            {errorLogin && <div className="mensaje-error">⚠ {errorLogin}</div>}
+            <button type="submit" className="boton boton-primario login-boton" disabled={comprobandoLogin}>
+              {comprobandoLogin ? 'Comprobando...' : 'Entrar'}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -226,6 +319,9 @@ function App() {
           </button>
           <button className="boton boton-primario" onClick={abrirFormularioNuevo}>
             + Añadir mueble
+          </button>
+          <button className="boton boton-secundario" onClick={() => cerrarSesion()}>
+            Cerrar sesión
           </button>
         </div>
       </div>

@@ -74,9 +74,9 @@ CREATE TABLE IF NOT EXISTS `categorias` (
 
 -- Insert Default Admin User
 -- Security Note: Password hash corresponds to raw text 'admin2026' via BCrypt
-INSERT INTO `usuarios` (`username`, `password`, `email`) 
-VALUES 
-('admin', '$2a$10$9X1n5G3Ouxh3gG74bM9OceA6KWRqX5zZ4.X4hG3mE8BszYVWeOmG2', 'gestion@mueblescpalma.com')
+INSERT INTO `usuarios` (`username`, `password`, `email`)
+VALUES
+('admin', '$2a$10$yt1o6JHV1I/QpGhPzikBTe21MQhuTmJr3F2AhH6CPW75K5iGihrk6', 'gestion@mueblescpalma.com')
 ON DUPLICATE KEY UPDATE `id`=`id`;
 
 -- Insert Sample Furniture Items
