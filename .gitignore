@@ -6,6 +6,7 @@
 *.class
 *.log
 *.sh
+logs/
 
 *.ctxt
 .DS_Store
@@ -33,10 +34,9 @@ infrastructure/docker/mysql_data/
 infrastructure/docker/db_data/
 *.env
 
-# Frontend / Node (For future phase)
+# Frontend / Node
 node_modules/
-frontend/dist/
-frontend/.next/
+frontend-admin/dist/
 
 # Frontend public images: ignore everything except the files the site
 # actually needs to render correctly (referenced from code or database)
