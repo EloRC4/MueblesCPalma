@@ -17,6 +17,12 @@ function resolverImagen(foto) {
   return foto.startsWith('http') ? foto : `${ASSETS_BASE_URL}${foto}`;
 }
 
+const FORMATO_PRECIO = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
+
+function formatearPrecio(precio) {
+  return precio == null ? '—' : FORMATO_PRECIO.format(precio);
+}
+
 async function subirArchivo(file) {
   const formData = new FormData();
   formData.append('file', file);
@@ -98,7 +104,7 @@ function App() {
 
   function abrirFormularioNuevo() {
     const categoriaPorDefecto = categorias[0]?.nombre ?? '';
-    setMuebleEnEdicion({ titulo: '', descripcion: '', tipo: categoriaPorDefecto, fotoPrincipal: '' });
+    setMuebleEnEdicion({ titulo: '', descripcion: '', tipo: categoriaPorDefecto, fotoPrincipal: '', precio: '' });
     setArchivoPrincipal(null);
     setArchivosAdicionales([]);
   }
@@ -127,6 +133,13 @@ function App() {
 
     try {
       const datosMueble = { ...muebleEnEdicion };
+
+      // El input devuelve el precio como texto: lo convertimos a número,
+      // o lo dejamos en null si se deja vacío (mueble sin precio publicado)
+      datosMueble.precio =
+        datosMueble.precio === '' || datosMueble.precio == null
+          ? null
+          : Number(datosMueble.precio);
 
       if (archivoPrincipal) {
         datosMueble.fotoPrincipal = await subirArchivo(archivoPrincipal);
@@ -232,6 +245,7 @@ function App() {
               <th>Foto</th>
               <th>Título</th>
               <th>Tipo</th>
+              <th>Precio</th>
               <th>Descripción</th>
               <th>Acciones</th>
             </tr>
@@ -248,6 +262,7 @@ function App() {
                 </td>
                 <td>{mueble.titulo}</td>
                 <td>{mueble.tipo}</td>
+                <td className="celda-precio">{formatearPrecio(mueble.precio)}</td>
                 <td>{mueble.descripcion}</td>
                 <td>
                   <div className="acciones-celda">
@@ -290,6 +305,19 @@ function App() {
                     <option key={cat.id} value={cat.nombre}>{cat.nombre}</option>
                   ))}
                 </select>
+              </div>
+
+              <div className="campo">
+                <label>Precio (€)</label>
+                <input
+                  type="number"
+                  name="precio"
+                  value={muebleEnEdicion.precio ?? ''}
+                  onChange={handleCambioInput}
+                  min="0"
+                  step="0.01"
+                  placeholder="Vacío = se mostrará «Consultar precio»"
+                />
               </div>
 
               <div className="campo">

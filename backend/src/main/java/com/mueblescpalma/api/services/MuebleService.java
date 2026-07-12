@@ -67,6 +67,7 @@ public class MuebleService {
             muebleExistente.setDescripcion(datosActualizados.getDescripcion());
             muebleExistente.setTipo(datosActualizados.getTipo());
             muebleExistente.setFotoPrincipal(datosActualizados.getFotoPrincipal());
+            muebleExistente.setPrecio(datosActualizados.getPrecio());
             return muebleRepository.save(muebleExistente);
         });
     }

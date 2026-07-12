@@ -328,12 +328,33 @@ main {
     line-height: 1.45;
 }
 
+.card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.card-precio {
+    color: var(--primary-strong);
+    font-size: 1.12rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.card-precio--consultar {
+    color: var(--muted);
+    font-size: 0.85rem;
+    font-weight: 700;
+    white-space: normal;
+}
+
 .btn-detalle {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     min-height: 40px;
-    margin-top: 1rem;
     padding: 0.55rem 0.9rem;
     background: var(--primary);
     border-radius: 6px;

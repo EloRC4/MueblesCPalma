@@ -226,6 +226,11 @@ body[data-admin-theme="oscuro"] {
   width: 110px;
 }
 
+.celda-precio {
+  white-space: nowrap;
+  font-weight: 600;
+}
+
 .miniatura {
   width: 90px;
   height: 90px;

@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS `muebles` (
     `descripcion` TEXT NOT NULL,
     `tipo` VARCHAR(50) NOT NULL,            -- Maps item taxonomy (e.g., 'sofa', 'mesa')
     `foto_principal` VARCHAR(255) NOT NULL, -- Cloud storage URL or relative path
+    `precio` DECIMAL(10,2) NULL,            -- Retail price in EUR; NULL renders as "price on request"
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
@@ -79,10 +80,10 @@ VALUES
 ON DUPLICATE KEY UPDATE `id`=`id`;
 
 -- Insert Sample Furniture Items
-INSERT INTO `muebles` (`id`, `titulo`, `descripcion`, `tipo`, `foto_principal`)
-VALUES 
-(1, 'Sofá Escandinavo Nordik', 'Sofá de tres plazas tapizado en lino transpirable con estructura de madera de haya maciza. Ideal para salones minimalistas.', 'sofa', 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc'),
-(2, 'Mesa de Comedor Industrial Roble', 'Mesa robusta con tablero de roble salvaje macizo de 4cm de grosor y patas geométricas de acero lacado en negro mate.', 'mesa', 'https://images.unsplash.com/photo-1577140917170-285929fb55b7')
+INSERT INTO `muebles` (`id`, `titulo`, `descripcion`, `tipo`, `foto_principal`, `precio`)
+VALUES
+(1, 'Sofá Escandinavo Nordik', 'Sofá de tres plazas tapizado en lino transpirable con estructura de madera de haya maciza. Ideal para salones minimalistas.', 'sofa', 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc', 899.00),
+(2, 'Mesa de Comedor Industrial Roble', 'Mesa robusta con tablero de roble salvaje macizo de 4cm de grosor y patas geométricas de acero lacado en negro mate.', 'mesa', 'https://images.unsplash.com/photo-1577140917170-285929fb55b7', 649.00)
 ON DUPLICATE KEY UPDATE `id`=`id`;
 
 -- Insert Product Gallery Collections (1:N Relations)

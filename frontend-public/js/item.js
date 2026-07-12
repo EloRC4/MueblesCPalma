@@ -1,5 +1,16 @@
 const API_URL = "http://localhost:8080/api/v1/muebles";
 
+const FORMATO_PRECIO = new Intl.NumberFormat("es-ES", {
+    style: "currency",
+    currency: "EUR",
+});
+
+// Devuelve el precio formateado en euros, o el texto alternativo
+// cuando el mueble no tiene precio asignado.
+function formatearPrecio(precio) {
+    return precio == null ? "Consultar precio en tienda" : FORMATO_PRECIO.format(precio);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(window.location.search);
     const idMueble = urlParams.get('id');
@@ -52,6 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div class="item-info-box">
                     <span class="item-categoria">${mueble.tipo}</span>
                     <h1>${mueble.titulo}</h1>
+                    <p class="item-precio ${mueble.precio == null ? 'item-precio--consultar' : ''}">${formatearPrecio(mueble.precio)}</p>
                     <hr>
                     <p><strong>Descripción detallada:</strong></p>
                     <p>${mueble.descripcion}</p>

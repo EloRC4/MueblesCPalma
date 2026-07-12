@@ -7,6 +7,11 @@
 const API_URL = "http://localhost:8080/api/v1/muebles";
 const RETRASO_BUSQUEDA_MS = 250;
 
+const FORMATO_PRECIO = new Intl.NumberFormat("es-ES", {
+    style: "currency",
+    currency: "EUR",
+});
+
 // Estado de la aplicación: el catálogo completo se carga una sola
 // vez y los filtros se aplican en memoria sobre esta copia.
 const estado = {
@@ -138,6 +143,15 @@ function obtenerMueblesFiltrados() {
         filtrados.sort((a, b) => a.titulo.localeCompare(b.titulo, "es"));
     } else if (orden === "titulo-desc") {
         filtrados.sort((a, b) => b.titulo.localeCompare(a.titulo, "es"));
+    } else if (orden === "precio-asc" || orden === "precio-desc") {
+        const direccion = orden === "precio-asc" ? 1 : -1;
+        // Los muebles sin precio se colocan siempre al final de la lista
+        filtrados.sort((a, b) => {
+            if (a.precio == null && b.precio == null) return 0;
+            if (a.precio == null) return 1;
+            if (b.precio == null) return -1;
+            return (a.precio - b.precio) * direccion;
+        });
     }
 
     return filtrados;
@@ -191,7 +205,10 @@ function crearTarjeta(mueble) {
         <div class="card-content">
             <h3>${escaparHtml(mueble.titulo)}</h3>
             <p>${escaparHtml(mueble.descripcion)}</p>
-            <a href="item.html?id=${encodeURIComponent(mueble.id)}" class="btn-detalle">Ver detalles</a>
+            <div class="card-footer">
+                <span class="card-precio ${mueble.precio == null ? "card-precio--consultar" : ""}">${formatearPrecio(mueble.precio)}</span>
+                <a href="item.html?id=${encodeURIComponent(mueble.id)}" class="btn-detalle">Ver detalles</a>
+            </div>
         </div>
     `;
 
@@ -213,6 +230,12 @@ function actualizarContador(visibles, total) {
 // ------------------------------------------------------------
 // Utilidades
 // ------------------------------------------------------------
+
+// Devuelve el precio formateado en euros, o el texto alternativo
+// cuando el mueble no tiene precio asignado.
+function formatearPrecio(precio) {
+    return precio == null ? "Consultar precio" : FORMATO_PRECIO.format(precio);
+}
 
 // Pasa el texto a minúsculas y elimina los acentos para que
 // "sillón" y "sillon" den el mismo resultado en la búsqueda.
