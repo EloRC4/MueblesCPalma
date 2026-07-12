@@ -11,6 +11,23 @@ function formatearPrecio(precio) {
     return precio == null ? "Consultar precio en tienda" : FORMATO_PRECIO.format(precio);
 }
 
+// Rellena los enlaces de WhatsApp y correo con un mensaje que ya
+// menciona el mueble que el visitante está viendo.
+function personalizarEnlacesContacto(mueble) {
+    const mensaje = `Hola, me interesa el mueble «${mueble.titulo}» que he visto en vuestra web.`;
+
+    const whatsapp = document.getElementById("accion-whatsapp");
+    if (whatsapp) {
+        whatsapp.href = `https://wa.me/34917063847?text=${encodeURIComponent(mensaje)}`;
+    }
+
+    const correo = document.getElementById("accion-correo");
+    if (correo) {
+        const asunto = `Consulta sobre «${mueble.titulo}»`;
+        correo.href = `mailto:mueblesc.palma@gmail.com?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(mensaje)}`;
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(window.location.search);
     const idMueble = urlParams.get('id');
@@ -74,6 +91,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     <a href="catalogo.html" class="btn-volver">Volver al Catálogo</a>
                 </div>
             `;
+
+            personalizarEnlacesContacto(mueble);
         })
         .catch(error => {
             console.error("Error:", error);
