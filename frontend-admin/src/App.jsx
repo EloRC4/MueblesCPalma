@@ -5,6 +5,7 @@ const API_URL = 'http://localhost:8080/api/v1/muebles';
 const CATEGORIAS_URL = 'http://localhost:8080/api/v1/categorias';
 const UPLOAD_URL = 'http://localhost:8080/api/v1/uploads';
 const AUTH_ME_URL = 'http://localhost:8080/api/v1/auth/me';
+const AUTH_PASSWORD_URL = 'http://localhost:8080/api/v1/auth/password';
 const ASSETS_BASE_URL = 'http://localhost:3000/assets/';
 
 const CLAVE_SESION = 'adminAuth';
@@ -77,6 +78,14 @@ function App() {
   const [mostrarGestorCategorias, setMostrarGestorCategorias] = useState(false);
   const [mostrarSelectorEstilos, setMostrarSelectorEstilos] = useState(false);
   const [nuevaCategoria, setNuevaCategoria] = useState('');
+
+  const [mostrarCambioClave, setMostrarCambioClave] = useState(false);
+  const [claveActual, setClaveActual] = useState('');
+  const [claveNueva, setClaveNueva] = useState('');
+  const [claveNuevaRepetida, setClaveNuevaRepetida] = useState('');
+  const [errorClave, setErrorClave] = useState(null);
+  const [exitoClave, setExitoClave] = useState(false);
+  const [cambiandoClave, setCambiandoClave] = useState(false);
   const [estiloAdmin, setEstiloAdmin] = useState(() => localStorage.getItem('adminStyle') || 'clasico');
 
   useEffect(() => {
@@ -128,6 +137,56 @@ function App() {
     setErrorLogin(mensaje);
     setError(null);
     cerrarFormulario();
+  }
+
+  function abrirCambioClave() {
+    setClaveActual('');
+    setClaveNueva('');
+    setClaveNuevaRepetida('');
+    setErrorClave(null);
+    setExitoClave(false);
+    setMostrarCambioClave(true);
+  }
+
+  async function cambiarClave(e) {
+    e.preventDefault();
+    setErrorClave(null);
+
+    if (claveNueva !== claveNuevaRepetida) {
+      setErrorClave('Las contraseñas nuevas no coinciden');
+      return;
+    }
+    if (claveNueva.trim().length < 8) {
+      setErrorClave('La nueva contraseña debe tener al menos 8 caracteres');
+      return;
+    }
+
+    setCambiandoClave(true);
+    try {
+      const res = await fetch(AUTH_PASSWORD_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...cabecerasAuth() },
+        body: JSON.stringify({ claveActual, claveNueva }),
+      });
+      if (!res.ok) throw await crearErrorDesdeRespuesta(res, 'No se pudo cambiar la contraseña');
+
+      // Renovamos las credenciales guardadas para que la sesión siga
+      // funcionando sin obligar a entrar de nuevo
+      const credenciales = atob(sessionStorage.getItem(CLAVE_SESION));
+      const username = credenciales.slice(0, credenciales.indexOf(':'));
+      const tokenNuevo = btoa(`${username}:${claveNueva}`);
+      sessionStorage.setItem(CLAVE_SESION, tokenNuevo);
+      setSesion(tokenNuevo);
+
+      setExitoClave(true);
+      setClaveActual('');
+      setClaveNueva('');
+      setClaveNuevaRepetida('');
+    } catch (err) {
+      setErrorClave(err.message);
+    } finally {
+      setCambiandoClave(false);
+    }
   }
 
   function cargarMuebles() {
@@ -317,6 +376,9 @@ function App() {
           <button className="boton boton-secundario" onClick={() => setMostrarGestorCategorias(true)}>
             Categorías
           </button>
+          <button className="boton boton-secundario" onClick={abrirCambioClave}>
+            Contraseña
+          </button>
           <button className="boton boton-primario" onClick={abrirFormularioNuevo}>
             + Añadir mueble
           </button>
@@ -500,6 +562,71 @@ function App() {
                 Cerrar
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: cambiar contraseña */}
+      {mostrarCambioClave && (
+        <div className="overlay" onClick={() => setMostrarCambioClave(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h2>Cambiar contraseña</h2>
+
+            {exitoClave ? (
+              <>
+                <p className="mensaje-exito">✔ Contraseña actualizada correctamente.</p>
+                <div className="modal-acciones">
+                  <button className="boton boton-primario" onClick={() => setMostrarCambioClave(false)}>
+                    Cerrar
+                  </button>
+                </div>
+              </>
+            ) : (
+              <form onSubmit={cambiarClave}>
+                <div className="campo">
+                  <label>Contraseña actual</label>
+                  <input
+                    type="password"
+                    value={claveActual}
+                    onChange={(e) => setClaveActual(e.target.value)}
+                    autoComplete="current-password"
+                    required
+                    autoFocus
+                  />
+                </div>
+                <div className="campo">
+                  <label>Nueva contraseña (mínimo 8 caracteres)</label>
+                  <input
+                    type="password"
+                    value={claveNueva}
+                    onChange={(e) => setClaveNueva(e.target.value)}
+                    autoComplete="new-password"
+                    required
+                  />
+                </div>
+                <div className="campo">
+                  <label>Repite la nueva contraseña</label>
+                  <input
+                    type="password"
+                    value={claveNuevaRepetida}
+                    onChange={(e) => setClaveNuevaRepetida(e.target.value)}
+                    autoComplete="new-password"
+                    required
+                  />
+                </div>
+
+                {errorClave && <div className="mensaje-error">⚠ {errorClave}</div>}
+
+                <div className="modal-acciones">
+                  <button type="submit" className="boton boton-primario" disabled={cambiandoClave}>
+                    {cambiandoClave ? 'Guardando...' : 'Cambiar contraseña'}
+                  </button>
+                  <button type="button" className="boton boton-secundario" onClick={() => setMostrarCambioClave(false)}>
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       )}

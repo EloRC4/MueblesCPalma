@@ -167,6 +167,14 @@ body[data-admin-theme="oscuro"] {
   margin-bottom: 1rem;
 }
 
+.mensaje-exito {
+  background-color: #e6f2e2;
+  color: #3e6b34;
+  padding: 0.7rem 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
 .modal-estilos {
   max-width: 360px;
 }
