@@ -1,4 +1,5 @@
 USE muebles_cpalma_db;
+SET NAMES utf8mb4;
 
 -- =============================================================================
 -- Silla Nórdica Roble y Lino
@@ -8,14 +9,9 @@ VALUES (
   'Silla Nórdica Roble y Lino',
   'Silla de comedor con patas de roble macizo y asiento tapizado en lino color crudo. Diseño escandinavo atemporal, combina con cualquier mesa de comedor.',
   'silla',
-  'silla_main.jpg',
+  'silla.jpg',
   129.00
 );
-SET @id_silla = LAST_INSERT_ID();
-INSERT INTO fotos_adicionales (mueble_id, foto_url) VALUES
-  (@id_silla, 'silla_det1.jpg'),
-  (@id_silla, 'silla_det2.jpg'),
-  (@id_silla, 'silla.jpg');
 
 -- =============================================================================
 -- Mesa Auxiliar Roble Natural
@@ -30,8 +26,7 @@ VALUES (
 );
 SET @id_mesa = LAST_INSERT_ID();
 INSERT INTO fotos_adicionales (mueble_id, foto_url) VALUES
-  (@id_mesa, 'mesa_det1.jpg'),
-  (@id_mesa, 'mesa.jpg');
+  (@id_mesa, 'mesa_det1.jpg');
 
 -- =============================================================================
 -- Sofá Chaise Longue Confort
@@ -46,6 +41,4 @@ VALUES (
 );
 SET @id_sofa = LAST_INSERT_ID();
 INSERT INTO fotos_adicionales (mueble_id, foto_url) VALUES
-  (@id_sofa, 'sofa_det1.jpg'),
-  (@id_sofa, 'sofa_det2.jpg'),
-  (@id_sofa, 'sofa.jpg');
+  (@id_sofa, 'sofa_det1.jpg');

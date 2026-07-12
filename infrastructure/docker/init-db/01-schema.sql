@@ -11,6 +11,10 @@ CREATE DATABASE IF NOT EXISTS `muebles_cpalma_db`
 
 USE `muebles_cpalma_db`;
 
+-- El cliente que ejecuta los scripts de inicialización debe leerlos como
+-- UTF-8 para que los acentos de los datos de ejemplo se almacenen bien
+SET NAMES utf8mb4;
+
 -- -----------------------------------------------------------------------------
 -- 1. Table: usuarios
 -- Description: Stores credentials for store managers.
