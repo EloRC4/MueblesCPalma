@@ -8,7 +8,7 @@ Aplicación web completa para una tienda de muebles real de Madrid: web pública
 ![MySQL](https://img.shields.io/badge/MySQL-8.0-blue)
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ed)
 
-![Catálogo público](docs/screenshots/catalogo.png)
+![Página principal](docs/screenshots/portada.jpg)
 
 ## Características
 
@@ -112,9 +112,13 @@ Esto compila la API (build multi-etapa de Maven sobre JRE Alpine, ejecutada como
 
 ## Capturas
 
-| Ficha de producto | Panel de gestión |
+| Catálogo | Ficha de producto |
 |---|---|
-| ![Detalle](docs/screenshots/detalle-mueble.png) | ![Panel](docs/screenshots/panel-gestion.png) |
+| ![Catálogo](docs/screenshots/catalogo.png) | ![Detalle](docs/screenshots/detalle-mueble.png) |
+
+| Panel de gestión | Acceso al panel |
+|---|---|
+| ![Panel](docs/screenshots/panel-gestion.png) | ![Login](docs/screenshots/panel-login.png) |
 
 ## Autor
 
