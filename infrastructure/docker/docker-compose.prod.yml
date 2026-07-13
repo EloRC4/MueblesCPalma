@@ -1,0 +1,67 @@
+# =============================================================================
+# Production stack - Muebles C Palma
+#
+# Runs the whole application on a single host:
+#   web   -> nginx with the public site, the panel (/admin/) and the API proxy
+#   api   -> Spring Boot backend (prod profile)
+#   mysql -> database with a persistent volume (not exposed to the host)
+#
+# Usage:
+#   cp .env.example .env   (then fill in the passwords)
+#   docker compose -f docker-compose.prod.yml up -d --build
+# =============================================================================
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: cpalma_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in the .env file}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-muebles_cpalma_db}
+      MYSQL_USER: ${MYSQL_USER:-cpalma_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in the .env file}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # Schema and seed scripts (only executed on an empty volume)
+      - ./init-db:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  api:
+    build:
+      context: ../../backend
+    container_name: cpalma_api
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-muebles_cpalma_db}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8
+      DB_USERNAME: ${MYSQL_USER:-cpalma_user}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      APP_UPLOAD_DIR: /var/www/assets
+    volumes:
+      # Images uploaded from the panel are shared with nginx
+      - uploads_data:/var/www/assets
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ../..
+      dockerfile: infrastructure/docker/web.Dockerfile
+    container_name: cpalma_web
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-80}:80"
+    volumes:
+      - uploads_data:/var/www/assets:ro
+    depends_on:
+      - api
+
+volumes:
+  mysql_data:
+  uploads_data:

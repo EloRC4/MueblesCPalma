@@ -1,10 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
-const API_URL = 'http://localhost:8080/api/v1/muebles';
-const CATEGORIAS_URL = 'http://localhost:8080/api/v1/categorias';
-const UPLOAD_URL = 'http://localhost:8080/api/v1/uploads';
-const ASSETS_BASE_URL = 'http://localhost:3000/assets/';
+// URLs are configured per environment (.env.development locally).
+// The defaults are relative paths meant for production, where nginx
+// serves the panel and the API under the same domain.
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api/v1';
+const ASSETS_BASE_URL = import.meta.env.VITE_ASSETS_BASE_URL ?? '/assets/';
+
+const API_URL = `${API_BASE_URL}/muebles`;
+const CATEGORIAS_URL = `${API_BASE_URL}/categorias`;
+const UPLOAD_URL = `${API_BASE_URL}/uploads`;
+const AUTH_ME_URL = `${API_BASE_URL}/auth/me`;
+const AUTH_PASSWORD_URL = `${API_BASE_URL}/auth/password`;
+
+const CLAVE_SESION = 'adminAuth';
+
+// Returns the Authorization header with the credentials stored at
+// login time. The backend requires them on every write operation.
+function cabecerasAuth() {
+  const token = sessionStorage.getItem(CLAVE_SESION);
+  return token ? { Authorization: `Basic ${token}` } : {};
+}
 
 const ESTILOS_ADMIN = [
   { id: 'clasico', nombre: 'Clásico' },
@@ -17,24 +33,30 @@ function resolverImagen(foto) {
   return foto.startsWith('http') ? foto : `${ASSETS_BASE_URL}${foto}`;
 }
 
+const FORMATO_PRECIO = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
+
+function formatearPrecio(precio) {
+  return precio == null ? '—' : FORMATO_PRECIO.format(precio);
+}
+
 async function subirArchivo(file) {
   const formData = new FormData();
   formData.append('file', file);
-  const res = await fetch(UPLOAD_URL, { method: 'POST', body: formData });
+  const res = await fetch(UPLOAD_URL, { method: 'POST', headers: cabecerasAuth(), body: formData });
   if (!res.ok) throw await crearErrorDesdeRespuesta(res, 'Error al subir la imagen');
   const data = await res.json();
   return data.filename;
 }
 
-// Construye un Error con .codigo (status HTTP) y .mensaje legible,
-// intentando leer el cuerpo JSON de error que devuelve el backend.
+// Builds an Error carrying .codigo (HTTP status) and a readable message,
+// trying to parse the JSON error body returned by the backend.
 async function crearErrorDesdeRespuesta(res, mensajePorDefecto) {
   let mensaje = mensajePorDefecto;
   try {
     const cuerpo = await res.json();
     if (cuerpo && cuerpo.mensaje) mensaje = cuerpo.mensaje;
   } catch {
-    // El cuerpo no era JSON, nos quedamos con el mensaje por defecto
+    // Body was not JSON; keep the default message
   }
   const error = new Error(mensaje);
   error.codigo = res.status;
@@ -42,6 +64,12 @@ async function crearErrorDesdeRespuesta(res, mensajePorDefecto) {
 }
 
 function App() {
+  const [sesion, setSesion] = useState(() => sessionStorage.getItem(CLAVE_SESION));
+  const [usuarioLogin, setUsuarioLogin] = useState('');
+  const [claveLogin, setClaveLogin] = useState('');
+  const [errorLogin, setErrorLogin] = useState(null);
+  const [comprobandoLogin, setComprobandoLogin] = useState(false);
+
   const [muebles, setMuebles] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -55,12 +83,21 @@ function App() {
   const [mostrarGestorCategorias, setMostrarGestorCategorias] = useState(false);
   const [mostrarSelectorEstilos, setMostrarSelectorEstilos] = useState(false);
   const [nuevaCategoria, setNuevaCategoria] = useState('');
+
+  const [mostrarCambioClave, setMostrarCambioClave] = useState(false);
+  const [claveActual, setClaveActual] = useState('');
+  const [claveNueva, setClaveNueva] = useState('');
+  const [claveNuevaRepetida, setClaveNuevaRepetida] = useState('');
+  const [errorClave, setErrorClave] = useState(null);
+  const [exitoClave, setExitoClave] = useState(false);
+  const [cambiandoClave, setCambiandoClave] = useState(false);
   const [estiloAdmin, setEstiloAdmin] = useState(() => localStorage.getItem('adminStyle') || 'clasico');
 
   useEffect(() => {
+    if (!sesion) return;
     cargarMuebles();
     cargarCategorias();
-  }, []);
+  }, [sesion]);
 
   useEffect(() => {
     localStorage.setItem('adminStyle', estiloAdmin);
@@ -68,7 +105,93 @@ function App() {
   }, [estiloAdmin]);
 
   function mostrarError(err) {
+    // If the backend rejects the credentials, go back to the login screen
+    if (err.codigo === 401) {
+      cerrarSesion('Tu sesión ya no es válida. Vuelve a iniciar sesión.');
+      return;
+    }
     setError({ codigo: err.codigo ?? '—', mensaje: err.message });
+  }
+
+  async function iniciarSesion(e) {
+    e.preventDefault();
+    setComprobandoLogin(true);
+    setErrorLogin(null);
+
+    // Validate the credentials against a protected endpoint:
+    // 200 means they are valid, 401 means they are not
+    const token = btoa(`${usuarioLogin}:${claveLogin}`);
+    try {
+      const res = await fetch(AUTH_ME_URL, { headers: { Authorization: `Basic ${token}` } });
+      if (!res.ok) {
+        throw new Error(res.status === 401 ? 'Usuario o contraseña incorrectos' : 'No se pudo conectar con el servidor');
+      }
+      sessionStorage.setItem(CLAVE_SESION, token);
+      setClaveLogin('');
+      setSesion(token);
+    } catch (err) {
+      setErrorLogin(err.message);
+    } finally {
+      setComprobandoLogin(false);
+    }
+  }
+
+  function cerrarSesion(mensaje = null) {
+    sessionStorage.removeItem(CLAVE_SESION);
+    setSesion(null);
+    setErrorLogin(mensaje);
+    setError(null);
+    cerrarFormulario();
+  }
+
+  function abrirCambioClave() {
+    setClaveActual('');
+    setClaveNueva('');
+    setClaveNuevaRepetida('');
+    setErrorClave(null);
+    setExitoClave(false);
+    setMostrarCambioClave(true);
+  }
+
+  async function cambiarClave(e) {
+    e.preventDefault();
+    setErrorClave(null);
+
+    if (claveNueva !== claveNuevaRepetida) {
+      setErrorClave('Las contraseñas nuevas no coinciden');
+      return;
+    }
+    if (claveNueva.trim().length < 8) {
+      setErrorClave('La nueva contraseña debe tener al menos 8 caracteres');
+      return;
+    }
+
+    setCambiandoClave(true);
+    try {
+      const res = await fetch(AUTH_PASSWORD_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...cabecerasAuth() },
+        body: JSON.stringify({ claveActual, claveNueva }),
+      });
+      if (!res.ok) throw await crearErrorDesdeRespuesta(res, 'No se pudo cambiar la contraseña');
+
+      // Refresh the stored credentials so the session keeps working
+      // without forcing a new login
+      const credenciales = atob(sessionStorage.getItem(CLAVE_SESION));
+      const username = credenciales.slice(0, credenciales.indexOf(':'));
+      const tokenNuevo = btoa(`${username}:${claveNueva}`);
+      sessionStorage.setItem(CLAVE_SESION, tokenNuevo);
+      setSesion(tokenNuevo);
+
+      setExitoClave(true);
+      setClaveActual('');
+      setClaveNueva('');
+      setClaveNuevaRepetida('');
+    } catch (err) {
+      setErrorClave(err.message);
+    } finally {
+      setCambiandoClave(false);
+    }
   }
 
   function cargarMuebles() {
@@ -98,7 +221,7 @@ function App() {
 
   function abrirFormularioNuevo() {
     const categoriaPorDefecto = categorias[0]?.nombre ?? '';
-    setMuebleEnEdicion({ titulo: '', descripcion: '', tipo: categoriaPorDefecto, fotoPrincipal: '' });
+    setMuebleEnEdicion({ titulo: '', descripcion: '', tipo: categoriaPorDefecto, fotoPrincipal: '', precio: '' });
     setArchivoPrincipal(null);
     setArchivosAdicionales([]);
   }
@@ -128,6 +251,13 @@ function App() {
     try {
       const datosMueble = { ...muebleEnEdicion };
 
+      // The input yields the price as text: convert it to a number,
+      // or keep null when left empty (item without a published price)
+      datosMueble.precio =
+        datosMueble.precio === '' || datosMueble.precio == null
+          ? null
+          : Number(datosMueble.precio);
+
       if (archivoPrincipal) {
         datosMueble.fotoPrincipal = await subirArchivo(archivoPrincipal);
       }
@@ -138,7 +268,7 @@ function App() {
 
       const res = await fetch(url, {
         method: metodo,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...cabecerasAuth() },
         body: JSON.stringify(datosMueble),
       });
       if (!res.ok) throw await crearErrorDesdeRespuesta(res, 'Error al guardar el mueble');
@@ -148,7 +278,7 @@ function App() {
         const nombreGuardado = await subirArchivo(archivo);
         await fetch(`${API_URL}/${muebleGuardado.id}/fotos`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', ...cabecerasAuth() },
           body: JSON.stringify({ fotoUrl: nombreGuardado }),
         });
       }
@@ -166,7 +296,7 @@ function App() {
     const confirmar = window.confirm('¿Seguro que quieres eliminar este mueble?');
     if (!confirmar) return;
 
-    fetch(`${API_URL}/${id}`, { method: 'DELETE' })
+    fetch(`${API_URL}/${id}`, { method: 'DELETE', headers: cabecerasAuth() })
       .then(async (res) => {
         if (!res.ok) throw await crearErrorDesdeRespuesta(res, 'Error al eliminar el mueble');
         cargarMuebles();
@@ -180,7 +310,7 @@ function App() {
 
     fetch(CATEGORIAS_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...cabecerasAuth() },
       body: JSON.stringify({ nombre: nuevaCategoria }),
     })
       .then(async (res) => {
@@ -192,12 +322,52 @@ function App() {
   }
 
   function eliminarCategoria(id) {
-    fetch(`${CATEGORIAS_URL}/${id}`, { method: 'DELETE' })
+    fetch(`${CATEGORIAS_URL}/${id}`, { method: 'DELETE', headers: cabecerasAuth() })
       .then(async (res) => {
         if (!res.ok) throw await crearErrorDesdeRespuesta(res, 'Error al eliminar la categoría');
         cargarCategorias();
       })
       .catch(mostrarError);
+  }
+
+  // Without a session only the login screen is rendered; the backend
+  // rejects any write without credentials regardless
+  if (!sesion) {
+    return (
+      <div className={`app-contenedor tema-admin-${estiloAdmin}`}>
+        <div className="login-panel">
+          <h1>Muebles C Palma</h1>
+          <p>Panel de gestión — acceso restringido</p>
+          <form onSubmit={iniciarSesion}>
+            <div className="campo">
+              <label>Usuario</label>
+              <input
+                type="text"
+                value={usuarioLogin}
+                onChange={(e) => setUsuarioLogin(e.target.value)}
+                autoComplete="username"
+                required
+                autoFocus
+              />
+            </div>
+            <div className="campo">
+              <label>Contraseña</label>
+              <input
+                type="password"
+                value={claveLogin}
+                onChange={(e) => setClaveLogin(e.target.value)}
+                autoComplete="current-password"
+                required
+              />
+            </div>
+            {errorLogin && <div className="mensaje-error">⚠ {errorLogin}</div>}
+            <button type="submit" className="boton boton-primario login-boton" disabled={comprobandoLogin}>
+              {comprobandoLogin ? 'Comprobando...' : 'Entrar'}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -211,8 +381,14 @@ function App() {
           <button className="boton boton-secundario" onClick={() => setMostrarGestorCategorias(true)}>
             Categorías
           </button>
+          <button className="boton boton-secundario" onClick={abrirCambioClave}>
+            Contraseña
+          </button>
           <button className="boton boton-primario" onClick={abrirFormularioNuevo}>
             + Añadir mueble
+          </button>
+          <button className="boton boton-secundario" onClick={() => cerrarSesion()}>
+            Cerrar sesión
           </button>
         </div>
       </div>
@@ -232,6 +408,7 @@ function App() {
               <th>Foto</th>
               <th>Título</th>
               <th>Tipo</th>
+              <th>Precio</th>
               <th>Descripción</th>
               <th>Acciones</th>
             </tr>
@@ -248,6 +425,7 @@ function App() {
                 </td>
                 <td>{mueble.titulo}</td>
                 <td>{mueble.tipo}</td>
+                <td className="celda-precio">{formatearPrecio(mueble.precio)}</td>
                 <td>{mueble.descripcion}</td>
                 <td>
                   <div className="acciones-celda">
@@ -265,7 +443,7 @@ function App() {
         </table>
       )}
 
-      {/* Modal: crear/editar mueble */}
+      {/* Modal: create/edit furniture item */}
       {muebleEnEdicion && (
         <div className="overlay" onClick={cerrarFormulario}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
@@ -290,6 +468,19 @@ function App() {
                     <option key={cat.id} value={cat.nombre}>{cat.nombre}</option>
                   ))}
                 </select>
+              </div>
+
+              <div className="campo">
+                <label>Precio (€)</label>
+                <input
+                  type="number"
+                  name="precio"
+                  value={muebleEnEdicion.precio ?? ''}
+                  onChange={handleCambioInput}
+                  min="0"
+                  step="0.01"
+                  placeholder="Vacío = se mostrará «Consultar precio»"
+                />
               </div>
 
               <div className="campo">
@@ -350,7 +541,7 @@ function App() {
         </div>
       )}
 
-      {/* Modal: selector de estilos */}
+      {/* Modal: theme picker */}
       {mostrarSelectorEstilos && (
         <div className="overlay" onClick={() => setMostrarSelectorEstilos(false)}>
           <div className="modal modal-estilos" onClick={(e) => e.stopPropagation()}>
@@ -380,7 +571,72 @@ function App() {
         </div>
       )}
 
-      {/* Modal: gestionar categorías */}
+      {/* Modal: change password */}
+      {mostrarCambioClave && (
+        <div className="overlay" onClick={() => setMostrarCambioClave(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h2>Cambiar contraseña</h2>
+
+            {exitoClave ? (
+              <>
+                <p className="mensaje-exito">✔ Contraseña actualizada correctamente.</p>
+                <div className="modal-acciones">
+                  <button className="boton boton-primario" onClick={() => setMostrarCambioClave(false)}>
+                    Cerrar
+                  </button>
+                </div>
+              </>
+            ) : (
+              <form onSubmit={cambiarClave}>
+                <div className="campo">
+                  <label>Contraseña actual</label>
+                  <input
+                    type="password"
+                    value={claveActual}
+                    onChange={(e) => setClaveActual(e.target.value)}
+                    autoComplete="current-password"
+                    required
+                    autoFocus
+                  />
+                </div>
+                <div className="campo">
+                  <label>Nueva contraseña (mínimo 8 caracteres)</label>
+                  <input
+                    type="password"
+                    value={claveNueva}
+                    onChange={(e) => setClaveNueva(e.target.value)}
+                    autoComplete="new-password"
+                    required
+                  />
+                </div>
+                <div className="campo">
+                  <label>Repite la nueva contraseña</label>
+                  <input
+                    type="password"
+                    value={claveNuevaRepetida}
+                    onChange={(e) => setClaveNuevaRepetida(e.target.value)}
+                    autoComplete="new-password"
+                    required
+                  />
+                </div>
+
+                {errorClave && <div className="mensaje-error">⚠ {errorClave}</div>}
+
+                <div className="modal-acciones">
+                  <button type="submit" className="boton boton-primario" disabled={cambiandoClave}>
+                    {cambiandoClave ? 'Guardando...' : 'Cambiar contraseña'}
+                  </button>
+                  <button type="button" className="boton boton-secundario" onClick={() => setMostrarCambioClave(false)}>
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Modal: manage categories */}
       {mostrarGestorCategorias && (
         <div className="overlay" onClick={() => setMostrarGestorCategorias(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>

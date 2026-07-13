@@ -1,3 +1,9 @@
+# =============================================================================
+# Development environment - Muebles C Palma
+# Starts MySQL only; the API and both frontends run locally.
+# The full production stack lives in docker-compose.prod.yml.
+# =============================================================================
+
 services:
   mysql:
     image: mysql:8.0
@@ -5,11 +11,15 @@ services:
     ports:
       - "3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: muebles_cpalma_db
-      MYSQL_USER: dev_cpalma_user
-      MYSQL_PASSWORD: dev_secure_password_2026
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-muebles_cpalma_db}
+      MYSQL_USER: ${MYSQL_USER:-dev_cpalma_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-dev_secure_password_2026}
     volumes:
-      # Esta línea es la que falta. 
-      # Mapea tu script local a la carpeta de inicialización automática de MySQL
+      # Named volume: data survives container re-creation
+      - mysql_data:/var/lib/mysql
+      # Schema and seed scripts (only executed on an empty volume)
       - ./init-db:/docker-entrypoint-initdb.d
+
+volumes:
+  mysql_data:

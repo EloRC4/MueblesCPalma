@@ -1,9 +1,10 @@
 package com.mueblescpalma.api.models;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonManagedReference; // Importación correcta
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "muebles")
@@ -25,24 +26,29 @@ public class Mueble {
     @Column(name = "foto_principal", nullable = false, length = 255)
     private String fotoPrincipal;
 
+    // Retail price in euros. Nullable: the public site renders it as "price on request"
+    @Column(precision = 10, scale = 2)
+    private BigDecimal precio;
+
     @OneToMany(mappedBy = "mueble", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference 
     private List<FotoAdicional> fotosAdicionales = new ArrayList<>();
 
-    // Constructor vacío obligatorio para JPA
+    // No-args constructor required by JPA
     public Mueble() {}
 
-    // Constructor completo
-    public Mueble(Long id, String titulo, String descripcion, String tipo, String fotoPrincipal, List<FotoAdicional> fotosAdicionales) {
+    // Full constructor
+    public Mueble(Long id, String titulo, String descripcion, String tipo, String fotoPrincipal, BigDecimal precio, List<FotoAdicional> fotosAdicionales) {
         this.id = id;
         this.titulo = titulo;
         this.descripcion = descripcion;
         this.tipo = tipo;
         this.fotoPrincipal = fotoPrincipal;
+        this.precio = precio;
         this.fotosAdicionales = fotosAdicionales;
     }
 
-    // Getters y Setters manuales
+    // Getters and setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -57,6 +63,9 @@ public class Mueble {
 
     public String getFotoPrincipal() { return fotoPrincipal; }
     public void setFotoPrincipal(String fotoPrincipal) { this.fotoPrincipal = fotoPrincipal; }
+
+    public BigDecimal getPrecio() { return precio; }
+    public void setPrecio(BigDecimal precio) { this.precio = precio; }
 
     public List<FotoAdicional> getFotosAdicionales() { return fotosAdicionales; }
     public void setFotosAdicionales(List<FotoAdicional> fotosAdicionales) { this.fotosAdicionales = fotosAdicionales; }

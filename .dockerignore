@@ -1,0 +1,14 @@
+# Docker build context: exclude everything that is not part of the
+# served artifacts
+.git
+.gitignore
+docs
+logs
+README.md
+
+backend/target
+frontend-admin/node_modules
+frontend-admin/dist
+
+# Original camera photos (only the web-sized versions are tracked)
+frontend-public/images/originales

@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛋️</text></svg>">
     <title>Muebles C Palma - Catálogo</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <!-- The ?v= parameter busts the browser cache whenever the file changes -->
+    <link rel="stylesheet" href="css/styles.css?v=3">
 </head>
 <body>
-    <nav class="catalog-nav">
+    <nav class="catalog-nav catalog-nav--dark">
         <a class="brand" href="index.html">Muebles C Palma</a>
         <ul class="nav-links">
             <li><a href="index.html">Inicio</a></li>
@@ -22,11 +24,53 @@
     </header>
 
     <main>
+        <section class="filtros" aria-label="Filtros del catálogo">
+            <div class="filtros-barra">
+                <button id="btn-toggle-filtros" class="btn-filtros" type="button"
+                        aria-expanded="false" aria-controls="panel-filtros">
+                    Filtrar y ordenar
+                    <span class="chevron" aria-hidden="true">▾</span>
+                </button>
+                <p id="contador-resultados" class="contador-resultados" role="status"></p>
+            </div>
+
+            <div id="panel-filtros" class="panel-filtros" hidden>
+                <div class="campo-filtro campo-filtro--busqueda">
+                    <label for="filtro-busqueda">Buscar</label>
+                    <input type="search" id="filtro-busqueda"
+                           placeholder="Título o descripción..." autocomplete="off">
+                </div>
+
+                <div class="campo-filtro">
+                    <label for="filtro-tipo">Tipo de mueble</label>
+                    <select id="filtro-tipo">
+                        <option value="">Todos los tipos</option>
+                    </select>
+                </div>
+
+                <div class="campo-filtro">
+                    <label for="filtro-orden">Ordenar por</label>
+                    <select id="filtro-orden">
+                        <option value="defecto">Por defecto</option>
+                        <option value="titulo-asc">Título (A-Z)</option>
+                        <option value="titulo-desc">Título (Z-A)</option>
+                        <option value="precio-asc">Precio (menor a mayor)</option>
+                        <option value="precio-desc">Precio (mayor a menor)</option>
+                    </select>
+                </div>
+
+                <button id="btn-limpiar-filtros" class="btn-limpiar" type="button">
+                    Limpiar filtros
+                </button>
+            </div>
+        </section>
+
         <section id="contenedor-muebles" class="grid-muebles">
             <p class="cargando">Cargando catálogo...</p>
         </section>
     </main>
 
-    <script src="js/app.js"></script>
+    <script src="js/config.js?v=1"></script>
+    <script src="js/app.js?v=4"></script>
 </body>
 </html>

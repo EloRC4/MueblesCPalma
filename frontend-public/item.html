@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛋️</text></svg>">
     <title>Detalle del Producto - Muebles C Palma</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
@@ -39,6 +40,17 @@
             justify-content: center;
         }
         .item-info-box h1 { margin-top: 0; color: var(--primary); }
+        .item-precio {
+            margin: 0;
+            color: var(--accent);
+            font-size: 1.7rem;
+            font-weight: 800;
+        }
+        .item-precio--consultar {
+            color: var(--muted);
+            font-size: 1.05rem;
+            font-weight: 700;
+        }
         .item-categoria { 
             display: inline-block;
             background: var(--accent);
@@ -70,17 +82,69 @@
             object-fit: cover;
             border-radius: 6px;
         }
+        .item-contacto {
+            max-width: 1000px;
+            margin: 0 auto 50px;
+            padding: 30px;
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+        .item-contacto h2 {
+            margin: 0 0 6px;
+            color: var(--primary);
+        }
+        .item-contacto > p {
+            margin: 0 0 22px;
+            color: var(--muted);
+        }
+        .contacto-acciones {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 14px;
+        }
+        .accion-contacto {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 18px 12px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            color: var(--ink);
+            text-decoration: none;
+            transition: transform 0.15s ease, border-color 0.15s ease;
+        }
+        .accion-contacto:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+        }
+        .accion-contacto strong {
+            color: var(--primary);
+        }
+        .accion-contacto span:last-child {
+            color: var(--muted);
+            font-size: 0.88rem;
+        }
+        .accion-icono {
+            font-size: 1.6rem;
+        }
         @media (max-width: 760px) {
             .container-item {
                 flex-direction: column;
                 margin: 20px 1rem;
                 padding: 20px;
             }
+            .item-contacto {
+                margin: 0 1rem 30px;
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <nav class="catalog-nav">
+    <nav class="catalog-nav catalog-nav--dark">
         <a class="brand" href="index.html">Muebles C Palma</a>
         <ul class="nav-links">
             <li><a href="index.html">Inicio</a></li>
@@ -93,6 +157,35 @@
         <p>Cargando especificaciones del mueble...</p>
     </div>
 
-    <script src="js/item.js"></script>
+    <section class="item-contacto" aria-label="Formas de contacto">
+        <h2>¿Te gusta este mueble?</h2>
+        <p>Llámanos, escríbenos o pásate por la tienda y te lo enseñamos sin compromiso.</p>
+        <div class="contacto-acciones">
+            <a class="accion-contacto" href="tel:+34917063847">
+                <span class="accion-icono" aria-hidden="true">📞</span>
+                <strong>Llámanos</strong>
+                <span>917 063 847</span>
+            </a>
+            <a class="accion-contacto" id="accion-whatsapp" href="https://wa.me/34646408588" target="_blank" rel="noopener">
+                <span class="accion-icono" aria-hidden="true">💬</span>
+                <strong>WhatsApp</strong>
+                <span>Escríbenos un mensaje</span>
+            </a>
+            <a class="accion-contacto" id="accion-correo" href="mailto:mueblesc.palma@gmail.com">
+                <span class="accion-icono" aria-hidden="true">✉️</span>
+                <strong>Correo</strong>
+                <span>mueblesc.palma@gmail.com</span>
+            </a>
+            <a class="accion-contacto" href="contacto.html">
+                <span class="accion-icono" aria-hidden="true">🛋️</span>
+                <strong>Ven a verlo</strong>
+                <span>C. Rafael Finat, 30 · Madrid</span>
+            </a>
+        </div>
+    </section>
+
+    <script src="js/config.js?v=1"></script>
+    <script src="js/item.js?v=6"></script>
+    <script src="js/lightbox.js"></script>
 </body>
 </html>

@@ -1,4 +1,32 @@
-const API_URL = "http://localhost:8080/api/v1/muebles";
+const API_URL = `${API_BASE_URL}/muebles`;
+
+const FORMATO_PRECIO = new Intl.NumberFormat("es-ES", {
+    style: "currency",
+    currency: "EUR",
+});
+
+// Returns the price formatted in euros, or the fallback text
+// when the item has no published price.
+function formatearPrecio(precio) {
+    return precio == null ? "Consultar precio en tienda" : FORMATO_PRECIO.format(precio);
+}
+
+// Pre-fills the WhatsApp and e-mail links with a message that
+// already mentions the item the visitor is looking at.
+function personalizarEnlacesContacto(mueble) {
+    const mensaje = `Hola, me interesa el mueble «${mueble.titulo}» que he visto en vuestra web.`;
+
+    const whatsapp = document.getElementById("accion-whatsapp");
+    if (whatsapp) {
+        whatsapp.href = `https://wa.me/34646408588?text=${encodeURIComponent(mensaje)}`;
+    }
+
+    const correo = document.getElementById("accion-correo");
+    if (correo) {
+        const asunto = `Consulta sobre «${mueble.titulo}»`;
+        correo.href = `mailto:mueblesc.palma@gmail.com?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(mensaje)}`;
+    }
+}
 
 document.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -16,19 +44,18 @@ document.addEventListener("DOMContentLoaded", () => {
             return response.json();
         })
         .then(mueble => {
-            // 🔄 Solución al Culpable 1: Comprobar si la foto principal es una URL externa
-            const rutaImagen = mueble.fotoPrincipal.startsWith('http') 
-                ? mueble.fotoPrincipal 
+            // The photo may be an absolute URL or a local file under assets/
+            const rutaImagen = mueble.fotoPrincipal.startsWith('http')
+                ? mueble.fotoPrincipal
                 : `assets/${mueble.fotoPrincipal}`;
 
-            // 🔄 Solución al Culpable 2: Adaptar al mapeo real de tu base de datos (fotosAdicionales -> fotoUrl)
             let galeriaHtml = "";
             
             if (mueble.fotosAdicionales && mueble.fotosAdicionales.length > 0) {
                 galeriaHtml = `<div class="item-galeria">`;
                 
                 mueble.fotosAdicionales.forEach(fotoObj => {
-                    // Validar también si las fotos secundarias son URLs externas
+                    // Gallery photos may also be external URLs
                     const rutaSecundaria = fotoObj.fotoUrl.startsWith('http') 
                         ? fotoObj.fotoUrl 
                         : `assets/${fotoObj.fotoUrl}`;
@@ -44,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 galeriaHtml = `<p class="sin-fotos">No hay imágenes adicionales para este modelo.</p>`;
             }
 
-            // Pintar los campos con los nombres exactos de tu entidad
+            // Render the item details
             contenedor.innerHTML = `
                 <div class="item-imagen-box">
                     <img src="${rutaImagen}" alt="${mueble.titulo}">
@@ -52,6 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div class="item-info-box">
                     <span class="item-categoria">${mueble.tipo}</span>
                     <h1>${mueble.titulo}</h1>
+                    <p class="item-precio ${mueble.precio == null ? 'item-precio--consultar' : ''}">${formatearPrecio(mueble.precio)}</p>
                     <hr>
                     <p><strong>Descripción detallada:</strong></p>
                     <p>${mueble.descripcion}</p>
@@ -62,6 +90,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     <a href="catalogo.html" class="btn-volver">Volver al Catálogo</a>
                 </div>
             `;
+
+            personalizarEnlacesContacto(mueble);
         })
         .catch(error => {
             console.error("Error:", error);

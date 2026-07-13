@@ -79,6 +79,38 @@ body[data-admin-theme="oscuro"] {
   padding-bottom: 1rem;
 }
 
+.login-panel {
+  max-width: 380px;
+  margin: 14vh auto 0;
+  padding: 2rem 2.2rem 2.2rem;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-soft-line);
+  border-radius: 12px;
+  box-shadow: var(--admin-shadow);
+  text-align: center;
+}
+
+.login-panel h1 {
+  margin: 0 0 0.2rem;
+  font-size: 1.5rem;
+  color: var(--admin-primary-dark);
+}
+
+.login-panel > p {
+  margin: 0 0 1.4rem;
+  color: var(--admin-muted);
+  font-size: 0.92rem;
+}
+
+.login-panel form {
+  text-align: left;
+}
+
+.login-boton {
+  width: 100%;
+  margin-top: 0.4rem;
+}
+
 .app-header h1 {
   font-size: 1.8rem;
   color: white;
@@ -130,6 +162,14 @@ body[data-admin-theme="oscuro"] {
 .mensaje-error {
   background-color: var(--admin-error-bg);
   color: var(--admin-danger);
+  padding: 0.7rem 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.mensaje-exito {
+  background-color: #e6f2e2;
+  color: #3e6b34;
   padding: 0.7rem 1rem;
   border-radius: 6px;
   margin-bottom: 1rem;
@@ -226,6 +266,11 @@ body[data-admin-theme="oscuro"] {
   width: 110px;
 }
 
+.celda-precio {
+  white-space: nowrap;
+  font-weight: 600;
+}
+
 .miniatura {
   width: 90px;
   height: 90px;
@@ -291,6 +336,8 @@ body[data-admin-theme="oscuro"] {
 }
 
 .campo input[type="text"],
+.campo input[type="password"],
+.campo input[type="number"],
 .campo textarea,
 .campo select {
   width: 100%;
